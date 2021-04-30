@@ -7,3 +7,13 @@ numerical/mendota/1_calibration/GOTM/meteo_file.dat
 numerical/mendota/1_calibration/Simstrat/meteo_file.dat
 numerical/mendota/1_calibration/Field/NLDAS2_Mendota_1979_2016_cell_5_GLMReady_cut_timezonecorr_LER.csv
 numerical/mendota/1_calibration/Field/NLDAS2_Mendota_1979_2016_cell_5_GLMReady_cut_timezonecorr.csv
+.Rproj.user
+numerical/mendota/2_validation/output/ensemble_output.nc
+numerical/mendota/2_validation/LakeEnsemblR_meteo_standard.csv
+numerical/mendota/2_validation/GLM/output/output.nc
+numerical/mendota/2_validation/GLM/meteo_file.csv
+numerical/mendota/2_validation/GOTM/output/output.nc
+numerical/mendota/2_validation/GOTM/meteo_file.dat
+numerical/mendota/2_validation/Simstrat/meteo_file.dat
+numerical/mendota/2_validation/Field/NLDAS2_Mendota_1979_2016_cell_5_GLMReady_cut_timezonecorr_LER.csv
+numerical/mendota/2_validation/Field/NLDAS2_Mendota_1979_2016_cell_5_GLMReady_cut_timezonecorr.csv

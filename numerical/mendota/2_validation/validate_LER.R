@@ -3,12 +3,22 @@ setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 # Load LakeEnsemblR
 library(LakeEnsemblR)
 
+file.copy(c('../1_calibration/LakeEnsemblR_bathymetry_standard.csv',
+            '../1_calibration/LakeEnsemblR_inflow_standard.csv',
+            '../1_calibration/LakeEnsemblR_initial_standard.csv',
+            '../1_calibration/LakeEnsemblR_meteo_standard.csv',
+            '../1_calibration/LakeEnsemblR_wtemp_profile_standard.csv',
+            '../1_calibration/LakeEnsemblR.yaml'), '.')
+
 # Set config file & models
 config_file <- 'LakeEnsemblR.yaml'
 model <- c("GLM", "GOTM", "Simstrat")
 
+input_yaml_multiple(file = config_file, value = "2011-01-01 00:00:00",
+                    key1 = "time", key2 = "start")
+input_yaml_multiple(file = config_file, value = "2015-12-30 00:00:00",
+                    key1 = "time", key2 = "stop")
 
-### (2) Calibration:
 export_config(config_file = config_file, model = model)
 glm_ice_fix <- "&snowice
    snow_albedo_factor = 1.0    //# scaling multiplier for computed albedo
@@ -42,41 +52,7 @@ glm_ice_fix <- "&snowice
    sed_heat_Ksoil = 0.1, 0.1
 /
 "
-write(glm_ice_fix,file="GLM/glm3.nml",append=TRUE)
 
-library(parallel)
-ncores <- length(model)
-clust <- parallel::makeCluster(ncores, setup_strategy = "sequential")
-clusterExport(clust, varlist = list("config_file"),
-              envir = environment())
-clusterEvalQ(clust, library(LakeEnsemblR))
-resMCMC <- parLapply(clust, model, function(m) {
-   cali_ensemble(config_file = config_file, 
-                 num = 5000, 
-                 cmethod = "LHC",
-                 model = m, parallel = TRUE)
-})
-stopCluster(clust)
-
-save(resMCMC, file = 'cal_LHC_5000_April13.RData')
-
-resMCMC[[1]]$GLM$bestpar
-pairs(resMCMC[[1]]$GLM)
-
-resMCMC[[2]]$GOTM$bestpar
-pairs(resMCMC[[2]]$GOTM)
-
-resMCMC[[3]]$Simstrat$bestpar
-pairs(resMCMC[[3]]$Simstrat)
-
-res_LHC <- load_LHC_results(config_file = config_file, model = model, res_files = unlist(resMCMC))
-best_p <- setNames(lapply(model, function(m)res_LHC[[m]][which.min(res_LHC[[m]]$rmse), ]), model)
-print(best_p)
-
-
-### (2) Use calibrated parameters:
-
-export_config(config_file = config_file, model = model)
 write(glm_ice_fix,file="GLM/glm3.nml",append=TRUE)
 
 run_ensemble(config_file = config_file, model = model)
