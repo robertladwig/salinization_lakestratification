@@ -83,6 +83,8 @@ run_ensemble(config_file = config_file, model = model)
 
 ncdf <- 'output/ensemble_output.nc'
 calc_fit(ncdf = ncdf, model = model)
+fit_analytics <- calc_fit(ncdf = ncdf, model = model)
+write.csv(fit_analytics, file = 'output/fit.csv')
 
 # Load libraries for post-processing
 library(gotmtools)

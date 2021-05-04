@@ -8,7 +8,7 @@ file.copy(c('../1_calibration/LakeEnsemblR_bathymetry_standard.csv',
             '../1_calibration/LakeEnsemblR_initial_standard.csv',
             '../1_calibration/LakeEnsemblR_meteo_standard.csv',
             '../1_calibration/LakeEnsemblR_wtemp_profile_standard.csv',
-            '../1_calibration/LakeEnsemblR.yaml'), '.')
+            '../1_calibration/LakeEnsemblR.yaml'), '.', overwrite = T)
 
 # Set config file & models
 config_file <- 'LakeEnsemblR.yaml'
@@ -18,6 +18,9 @@ input_yaml_multiple(file = config_file, value = "2011-01-01 00:00:00",
                     key1 = "time", key2 = "start")
 input_yaml_multiple(file = config_file, value = "2015-12-30 00:00:00",
                     key1 = "time", key2 = "stop")
+
+# input_yaml_multiple(file = config_file, value = "LakeEnsemblR_wtemp_profile_cut.csv",
+#                     key1 = "observations", key2 = "temperature", key3 = "file")
 
 export_config(config_file = config_file, model = model)
 glm_ice_fix <- "&snowice
@@ -58,7 +61,8 @@ write(glm_ice_fix,file="GLM/glm3.nml",append=TRUE)
 run_ensemble(config_file = config_file, model = model)
 
 ncdf <- 'output/ensemble_output.nc'
-calc_fit(ncdf = ncdf, model = model)
+fit_analytics <- calc_fit(ncdf = ncdf, model = model)
+write.csv(fit_analytics, file = 'output/fit.csv')
 
 # Load libraries for post-processing
 library(gotmtools)
@@ -134,7 +138,7 @@ out_res <- analyse_ncdf(ncdf = ncdf,
 names(out_res)
 
 print(out_res[["stats"]])
-write.csv(out_res[["stats"]], file = 'output/stats.csv')
+
 print(out_res[["strat"]])
 
 ggplot(out_res[["strat"]], aes(year, TotIceDur, col = model)) + geom_line() + geom_point() 
