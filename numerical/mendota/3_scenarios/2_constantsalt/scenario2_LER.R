@@ -32,6 +32,11 @@ input_yaml_multiple(file = config_file, value = "LakeEnsemblR_inflow_scenario1.c
                     key1 = "inflows", key2 = "file")
 
 export_config(config_file = config_file, model = model)
+file.copy(from = '../salt_cond.dat', to = 'GOTM/', overwrite = T)
+input_yaml_multiple(file = 'GOTM/gotm.yaml', value = "salt_cond.dat",
+                    key1 = "salinity", key2 = "file")
+input_yaml_multiple(file = 'GOTM/gotm.yaml', value = 2,
+                    key1 = "salinity", key2 = "method")
 glm_ice_fix <- "&snowice
    snow_albedo_factor = 1.0    //# scaling multiplier for computed albedo
    snow_rho_max       = 300.   //# maximum snow density allowed

@@ -33,8 +33,8 @@ temperature:                            # temperature profile used for initializ
       h_b: 0.0                          # height of bottom relaxation layer [m; min=0.0; default=0.0]
       tau_b: 1.00000000E+15             # time scale for bottom layer [s; min=0.0; default=1.00000000E+15]      
 salinity:                               # salinity profile used for initialization and optionally relaxation
-   method: 0                            # method [0=off, 1=analytical, 2=from file; default=0]
-   file:                                # path to file with series of profiles [default=]
+   method: 2 # method [0=off, 1=analytical, 2=from file; default=0]
+   file: salt_cond_null.dat # path to file with series of profiles [default=]
    column: 1                            # index of column to read from [default=1]
    analytical:
       method: 1                         # type of analytical initial salinity profile [1=constant, 2=two layers, 3=from temperature and buoyancy frequency; default=1]
