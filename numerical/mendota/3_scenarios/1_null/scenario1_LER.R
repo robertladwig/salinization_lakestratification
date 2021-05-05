@@ -168,3 +168,24 @@ g <- ggplot(df, aes(datetime, value, colour = model)) +
    labs(y = "Schmidt stability (J/m2)") +
    theme_light(); g
 ggsave('output/ensemble_schmidt.png', g,  dpi = 300,width = 384,height = 180, units = 'mm')
+
+df = data.frame('datetime' = out$GLM$datetime,
+                'GLM' = out$GLM$wtr_2,
+                'GOTM' = out$GOTM$wtr_2,
+                'Simstrat' = out$Simstrat$wtr_2)
+m.df = reshape2::melt(df, id = 'datetime')
+wtr.df = m.df %>%
+   dplyr::group_by(datetime) %>%
+   dplyr::summarise(wtr = mean(value, na.rm = T))
+
+flow = read.csv('../../../monona/1_calibration/Mendota_outflow_30year.csv')
+flow = flow %>%
+   dplyr::filter(time >= min(wtr.df$datetime) )
+
+df = data.frame('datetime' = wtr.df$datetime,
+                'Flow_metersCubedPerSecond' = flow$FLOW,
+                'Water_Temperature_celsius' = wtr.df$wtr,
+                'Salinity_practicalSalinityUnits' = rep(0, nrow(wtr.df)))
+
+write.csv(df, file = '../../../monona/1_calibration/LakeEnsemblR_inflow_standard.csv',quote = F,row.names = F)
+
