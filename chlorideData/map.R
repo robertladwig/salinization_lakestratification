@@ -4,6 +4,7 @@ library(ggrepel)
 library(tidyverse)
 library(NTLlakeloads)
 library(patchwork)
+library(lubridate)
 
 # esri_land <-    paste0('https://services.arcgisonline.com/arcgis/rest/services/NatGeo_World_Map/MapServer/tile/${z}/${y}/${x}.jpeg')
 # esri_streets <- paste0('https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer/tile/${z}/${y}/${x}.jpeg')
@@ -11,14 +12,27 @@ world_gray <-   paste0('https://services.arcgisonline.com/arcgis/rest/services/C
 basemap <- paste0('https://tiles.wmflabs.org/osm-no-labels/${z}/${x}/${y}.png')
 
 # lakes
-lakes.S = st_read('ntl152_v2_0/') %>% filter(LAKEID %in% c('ME'))
-bathy = st_read('ntl153_v3_0/mendota-contours-all.shp') %>% 
+lakes.S = st_read('chlorideData/ntl152_v2_0/') %>% filter(LAKEID %in% c('ME', 'MO'))
+bathyME = st_read('chlorideData/ntl153_v3_0/mendota-contours-all.shp') %>% 
   st_set_crs(3071)
+bathyMO = st_read('chlorideData/ntl153_v3_0/monona_bathy.shp') %>% 
+  st_set_crs(3071)
+
+# sampling locations
+# Lake Mendota	43.09885,-89.40545
+# Lake Monona	43.06337,-89.36086
+# Manually build a dataframe 
+sampling.sites = data.frame(site = c('ME','MO'),lat = c(43.09885, 43.06337), lon = c(-89.40545,-89.36086))
+sampling.sites.sf = st_as_sf(sampling.sites, coords = c("lon", "lat"), 
+                      crs = 4326)
 
 mapS = ggplot(lakes.S) +
   annotation_map_tile(type = world_gray, zoom = 14) +
   # geom_sf(data = lakes.S, fill = alpha('lightsteelblue1',1), size = 0.2) +
-  geom_sf(data = bathy, fill = alpha('#bfd9e0',1), color = 'grey50', size = 0.1) +
+  geom_sf(data = bathyME, fill = alpha('#bfd9e0',1), color = 'grey50', size = 0.1) +
+  geom_sf(data = bathyMO, fill = alpha('#bfd9e0',1), color = 'grey50', size = 0.1) +
+  geom_sf(data = sampling.sites.sf, aes(fill = site), size = 1, shape = 21, show.legend = FALSE) +
+  scale_fill_manual(values = c('#bfd9e0', '#cfd160')) +
   # geom_sf_label(data = lakes.S, aes(label = SHAIDNAME), label.size = 0.1, alpha = 0.7, size = 2) +
   annotation_scale(location = "bl", width_hint = 0.2, height = unit(0.05,'in'), text_cex = 0.6) + # Scale bar
   annotation_north_arrow(location = "tr", which_north = "true",
@@ -35,7 +49,7 @@ mapS = ggplot(lakes.S) +
   # coord_sf(xlim = c(-89.71, -89.58), ylim = c(45.99, 46.04)) +
   NULL
 
-ggsave('Map_Mendota.png', width = 3, height = 4, dpi = 500, bg = "transparent")
+ggsave('chlorideData/Map_Mendota_Monona.png', width = 4, height = 4, dpi = 500, bg = "transparent")
 
 ##### Chloride ########
 ions = loadLTERions()
@@ -45,42 +59,58 @@ inUrl1  <- "https://pasta.lternet.edu/package/data/eml/knb-lter-ntl/319/17/ada50
 infile1 <- tempfile()
 try(download.file(inUrl1,infile1,method="curl"))
 
-me.dnr = read_csv(infile1) %>% filter(lakeid == 'ME') %>% 
-  group_by(year4) %>% 
+me.dnr = read_csv(infile1) %>% filter(lakeid %in% c('ME','MO')) %>% 
+  group_by(year4, lakeid) %>% 
   summarise(mean.cl = mean(cl, na.rm = T)) %>% 
   mutate(sampledate = as.Date(paste0(year4,'-07-01')))
 
-me.cl = ions %>% filter(lakeid == 'ME') %>% 
+# Mendota chloride before 1995
+me.dnr = read_csv('chlorideData/LakeMendota_Dane_WI_VIII.csv') %>% mutate(lakeid = 'ME') %>% 
+  bind_rows(read_csv('chlorideData/LakeMonona_Dane_WI_VIII.csv') %>%  mutate(lakeid = 'MO')) %>% 
+  mutate(year4 = year(Sample.Date)) %>% 
+  group_by(year4, lakeid) %>% 
+  summarise(mean.cl = mean(Chloride, na.rm = T)) %>% 
+  mutate(sampledate = as.Date(paste0(year4,'-07-01')))
+
+
+me.cl = ions %>% filter(lakeid %in% c('ME','MO')) %>% 
   filter(!is.na(cl))
 
-me.cl.mean = me.cl %>% group_by(year4) %>% 
+me.cl.mean = me.cl %>% group_by(lakeid, year4) %>% 
   summarise(mean.cl = mean(cl, na.rm = T)) %>% 
   mutate(sampledate = as.Date(paste0(year4,'-07-01')))
 
-cl1 = ggplot(me.dnr) +
-  geom_point(aes(x = sampledate, y = cl), shape = 21, fill = '#bfd9e0') +
-  geom_point(data = me.cl, aes(x = sampledate, y = cl), shape = 21, fill = '#bfd9e0') +
-  ylab(bquote('Chloride Concentration' ~ (mg~L^-1))) +
-  theme_bw(base_size = 8) +
-  theme(axis.title.x = element_blank())
+# cl1 = ggplot(me.dnr) +
+#   geom_point(aes(x = sampledate, y = cl, group = lakeid), shape = 21, fill = '#bfd9e0') +
+#   geom_point(data = me.cl, aes(x = sampledate, y = cl, group = lakeid), shape = 21, fill = '#bfd9e0') +
+#   ylab(bquote('Chloride Concentration' ~ (mg~L^-1))) +
+#   theme_bw(base_size = 8) +
+#   theme(axis.title.x = element_blank())
 
 cl1.mean = ggplot(me.dnr) +
-  geom_point(aes(x = sampledate, y = mean.cl), shape = 21, fill = '#bfd9e0') +
-  geom_point(data = me.cl.mean, aes(x = sampledate, y = mean.cl), shape = 21, fill = '#bfd9e0') +
-  ylab(bquote('Chloride Concentration' ~ (mg~L^-1))) +
+  geom_point(aes(x = sampledate, y = mean.cl, group = lakeid, fill = lakeid), shape = 21) +
+  geom_point(data = me.cl.mean, aes(x = sampledate, y = mean.cl, group = lakeid, fill = lakeid), shape = 21) +
+  scale_fill_manual(values = c('#bfd9e0', '#cfd160'), name = 'Lake', labels = c('Mendota','Monona')) +
+  ylab(bquote('Chloride' ~ (mg~L^-1))) +
   theme_bw(base_size = 8) +
-  theme(axis.title.x = element_blank())
+  theme(axis.title.x = element_blank(), 
+        legend.text = element_text(size = 6),
+        legend.title = element_blank(), 
+        legend.box.background = element_rect(colour = "black"),
+        legend.key.height =  unit(0.2,"cm"), 
+        legend.key.width =  unit(0.2,"cm"), 
+        legend.position=c(.2,.85)); cl1.mean
 
-mapS + cl1 +
-  plot_annotation(tag_levels = 'a', tag_suffix = ')') &
-  theme(plot.tag = element_text(size = 8))
-ggsave('Map_Mendota_Cl.png', width = 6.5, height = 4, dpi = 500, bg = "transparent")
+# mapS + cl1 +
+#   plot_annotation(tag_levels = 'a', tag_suffix = ')') &
+#   theme(plot.tag = element_text(size = 8))
+# ggsave('Map_Mendota_Cl.png', width = 6.5, height = 4, dpi = 500, bg = "transparent")
 
 
 mapS + cl1.mean +
   plot_annotation(tag_levels = 'a', tag_suffix = ')') &
   theme(plot.tag = element_text(size = 8))
-ggsave('Map_Mendota_Cl.mean.png', width = 6.5, height = 4, dpi = 500, bg = "transparent")
+ggsave('chlorideData/Map_Mendota_Monona_Cl.mean.png', width = 6.5, height = 4, dpi = 500, bg = "transparent")
 
 
 
