@@ -80,13 +80,6 @@ me.cl.mean = me.cl %>% group_by(lakeid, year4) %>%
   summarise(mean.cl = mean(cl, na.rm = T)) %>% 
   mutate(sampledate = as.Date(paste0(year4,'-07-01')))
 
-# cl1 = ggplot(me.dnr) +
-#   geom_point(aes(x = sampledate, y = cl, group = lakeid), shape = 21, fill = '#bfd9e0') +
-#   geom_point(data = me.cl, aes(x = sampledate, y = cl, group = lakeid), shape = 21, fill = '#bfd9e0') +
-#   ylab(bquote('Chloride Concentration' ~ (mg~L^-1))) +
-#   theme_bw(base_size = 8) +
-#   theme(axis.title.x = element_blank())
-
 cl1.mean = ggplot(me.dnr) +
   geom_point(aes(x = sampledate, y = mean.cl, group = lakeid, fill = lakeid), shape = 21) +
   geom_point(data = me.cl.mean, aes(x = sampledate, y = mean.cl, group = lakeid, fill = lakeid), shape = 21) +
@@ -100,12 +93,6 @@ cl1.mean = ggplot(me.dnr) +
         legend.key.height =  unit(0.2,"cm"), 
         legend.key.width =  unit(0.2,"cm"), 
         legend.position=c(.2,.85)); cl1.mean
-
-# mapS + cl1 +
-#   plot_annotation(tag_levels = 'a', tag_suffix = ')') &
-#   theme(plot.tag = element_text(size = 8))
-# ggsave('Map_Mendota_Cl.png', width = 6.5, height = 4, dpi = 500, bg = "transparent")
-
 
 mapS + cl1.mean +
   plot_annotation(tag_levels = 'a', tag_suffix = ')') &
