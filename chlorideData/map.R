@@ -52,7 +52,7 @@ mapS = ggplot(lakes.S) +
 ggsave('chlorideData/Map_Mendota_Monona.png', width = 4, height = 4, dpi = 500, bg = "transparent")
 
 ##### Chloride ########
-ions = loadLTERions()
+ions = loadLTERions() %>%  filter(lakeid %in% c('ME','MO'))
 
 # knb-lter-ntl.319.17 Mendota chloride before 1995
 inUrl1  <- "https://pasta.lternet.edu/package/data/eml/knb-lter-ntl/319/17/ada50bfcdf3672cb145ab6ba0a4d75d1" 
