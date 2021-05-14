@@ -1,0 +1,146 @@
+&glm_setup
+   sim_name = 'GLMSimulation'
+   max_layers = 167
+   min_layer_vol = 0.5
+   min_layer_thick = 0.15
+   max_layer_thick = 1
+   density_model = 1
+   non_avg = .true.
+/
+&mixing
+   surface_mixing = 1
+   coef_mix_conv = 0.2
+   coef_wind_stir = 0.23
+   coef_mix_shear = 0.51
+   coef_mix_turb = 0.3
+   coef_mix_KH = 0.13165,
+   deep_mixing = 2
+   coef_mix_hyp = 0.77976,
+   diff = 0
+/
+&morphometry
+   lake_name = 'Mendota'
+   latitude = 43
+   longitude = -89.41
+   bsn_len = 3678,
+   bsn_wid = 944,
+   crest_elev = 258
+   bsn_vals = 26
+   H = 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258
+   A = 0, 1e+05, 1600000, 3500000, 5900000, 8600000, 11300000, 13700000, 15200000, 16400000, 17600000, 18400000, 19900000, 21100000, 22700000, 2.4e+07, 2.5e+07, 2.6e+07, 2.7e+07, 27800000, 28700000, 30300000, 32100000, 3.4e+07, 3.6e+07, 39850000
+/
+&time
+   timefmt = 2
+   start = '1995-01-01 00:00:00'
+   stop = '2015-12-30 00:00:00'
+   dt = 3600
+   timezone = 0
+   num_days = 150
+/
+&output
+   out_dir = 'output'
+   out_fn = 'output'
+   nsave = 24
+/
+&init_profiles
+   lake_depth = 25
+   num_depths = 25
+   the_depths = 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24
+   the_temps = 0.2, 0.4, 0.5, 0.5, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.7, 0.7, 0.7, 0.7, 0.8, 0.9, 1, 1.1, 1.3, 1.4, 1.5, 1.5, 1.5, 1.8, 2.2
+   the_sals = 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+/
+&meteorology
+   met_sw = .true.
+   lw_type = 'LW_IN'
+   rain_sw = .false.
+   atm_stab = 0
+   catchrain = .false.
+   rad_mode = 1
+   albedo_mode = 1
+   cloud_mode = 4
+   fetch_mode = 0
+   subdaily = .true.
+   meteo_fl = 'meteo_file.csv'
+   wind_factor = 1
+   sw_factor = 1
+   lw_factor = 1
+   at_factor = 1
+   rh_factor = 1
+   rain_factor = 1
+   ce = 0.0013
+   ch = 0.0029885,
+   cd = 0.0013
+   rain_threshold = 0.01
+   runoff_coef = 0.3
+/
+&bird_model
+   AP = 973
+   Oz = 0.279
+   WatVap = 1.1
+   AOD500 = 0.033
+   AOD380 = 0.038
+   Albedo = 0.2
+/
+&light
+   light_mode = 0
+   n_bands = 4
+   light_extc = 1, 0.5, 2, 4
+   energy_frac = 0.51, 0.45, 0.035, 0.005
+   Benthic_Imin = 10
+   Kw = 1.3
+/
+&inflow
+   num_inflows = 1
+   names_of_strms = 'Riv1'
+   subm_flag = .false.
+   strm_hf_angle = 65
+   strmbd_slope = 2
+   strmbd_drag = 0.016
+   inflow_factor = 1
+   inflow_fl = 'inflow_file.csv'
+   inflow_varnum = 3
+   inflow_vars = 'FLOW','TEMP','SALT'
+/
+&outflow
+   num_outlet = 1
+   flt_off_sw = .false.
+   outl_elvs = 258
+   bsn_len_outl = 5
+   bsn_wid_outl = 5
+   outflow_fl = 'outflow.csv'
+   outflow_factor = 1
+   crest_width = 100
+   crest_factor = 0.61
+/
+&snowice
+   snow_albedo_factor = 1.0    //# scaling multiplier for computed albedo
+   snow_rho_max       = 300.   //# maximum snow density allowed
+   snow_rho_min       = 50.    //# minimum snow density allowed
+   snow_water_equivalent = 0.1 //# snow volume to water equivalent, 10:1
+   snow_rain_compact = 1.      //# set at module level
+   K_ice_white = 2.3           //# thermal conductivity of white ice
+   K_ice_blue = 2.0            //# thermal conductivity of blue ice
+   K_water = 0.57              //# molecular thermal conductivity of water
+   f_sw_wl1 = 0.7              //# fraction of short wave radiation in first wavelength band
+   f_sw_wl2 = 0.3              //# fraction of short wave radiation in second wavelength band
+   attn_ice_blue_wl1 = 1.5     //# attenuation coefficient of the ice in the first spectral band
+   attn_ice_blue_wl2 = 20.     //# attenuation coefficient of the ice in the second spectral band
+   attn_ice_white_wl1 = 6.0    //# attenuation coefficient of the white ice in the first spectral band
+   attn_ice_white_wl2 = 20.    //# attenuation coefficient of the white ice in the second spectral band
+   attn_snow_wl1 = 6.0         //# attenuation coefficient of the snow in the first spectral band
+   attn_snow_wl2 = 20.         //# attenuation coefficient of the snow in the second spectral band
+   rho_ice_blue = 917.0        //# density of blue ice
+   rho_ice_white = 890.0       //# density of white ice
+   min_ice_thickness = 0.05    //# threshold thickness for new ice-on, or ice-off
+   dt_iceon_avg = 0.01          //# moving average time-scale of water temp to identify ice-on transition
+/
+&sediment
+   benthic_mode = 2
+   n_zones = 2
+   zone_heights = 10, 25
+   sed_temp_mean = 5.05, 13.5
+   sed_temp_amplitude = 4, 3
+   sed_temp_peak_doy = 230, 230
+   sed_heat_Ksoil = 0.1, 0.1
+/
+

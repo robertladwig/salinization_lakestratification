@@ -147,7 +147,7 @@ light_extinction:
       column: 1                         # index of column to read from [default=1]
    g2:                                  # e-folding depth of visible shortwave radiation
       method: 0 # /LER/ method [0=constant, 2=from file; default=0]
-      constant_value: 3.1357 # /LER/ value to use throughout the simulation [m; min=0.0; default=8.0]
+      constant_value: 3.4451 # /LER/ value to use throughout the simulation [m; min=0.0; default=8.0]
       file:                             # /LER/ path to file with time series [default=]
       column: 1                         # /LER/ index of column to read from [default=1]
 turbulence:
@@ -167,7 +167,7 @@ turbulence:
       galp: 0.27                        # coefficient for length scale limitation [dimensionless; min=0.0; default=0.27]
       const_num: 5.00000000E-04         # constant eddy diffusivity [m^2/s; min=0.0; default=5.00000000E-04]
       const_nuh: 5.00000000E-04         # constant heat diffusivity [m^2/s; min=0.0; default=5.00000000E-04]
-      k_min: 1.9568e-08 # minimum turbulent kinetic energy [m^2/s^2; min=0.0; default=1.00000000E-10]
+      k_min: 1.1514e-06 # minimum turbulent kinetic energy [m^2/s^2; min=0.0; default=1.00000000E-10]
       eps_min: 1.00000000E-12           # minimum dissipation rate [m^2/s^3; min=0.0; default=1.00000000E-12]
       kb_min: 1.00000000E-10            # minimum buoyancy variance [m^2/s^4; min=0.0; default=1.00000000E-10]
       epsb_min: 1.00000000E-14          # minimum buoyancy variance destruction rate [m^2/s^5; min=0.0; default=1.00000000E-14]
