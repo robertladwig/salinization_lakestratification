@@ -11,6 +11,7 @@ library(ggpubr)
 library(RColorBrewer)
 library(colorspace)
 library(patchwork)
+library(scales)
 
 df <- read.csv('output/density.csv')
 df_wtr <- read.csv('output/wtemp.csv')
@@ -23,12 +24,14 @@ df_ssi$datetime <- as.POSIXct(df_ssi$datetime)
 df_ice$datetime <- as.POSIXct(df_ice$datetime)
 
 col_blues <- colorRampPalette(c("gray",'cyan', "darkblue"))
+col_blues <- colorRampPalette(c("gray",'cyan', "darkblue", 'red1','red4'))
+
 
 colnames(df) <- c('datetime','null','0.1','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10','id')
 m.df <- reshape2::melt(df, id = c('datetime', 'id'))
 
 g_density <- ggplot(m.df) +
-  geom_line(aes(datetime, (value), col = variable)) +
+  geom_step(aes(datetime, (value), col = variable)) +
   ylab('Density differences [g/kg]') +
   xlab('') +
   facet_wrap(~ id)+
@@ -50,6 +53,7 @@ g <- ggplot(subset(m.df_ice, datetime > '2013-12-30')) +
   # geom_hline(yintercept = 1.1, linetype = 'dashed') +
   theme_minimal()+
   theme(legend.position = 'bottom'); g
+
 ggsave('figs/ice.png', g,  dpi = 300,width = 250,height = 200, units = 'mm')
 
 df_ssi_scaled = df_ssi
@@ -139,14 +143,17 @@ df.mixedDated$id = c(rep('mendota', length(unique(year(df$datetime)))), rep('mon
 df.mixedDated$year <- unique(year(df$datetime))
 m.df.mixedDated <- reshape2::melt(df.mixedDated, id = c('year','id'))
 
-g_mixing <- ggplot(m.df.mixedDated, aes(year, value, col = variable)) +
-  geom_line() + 
-  ylab('First mixing day of the year') + xlab('') +
+g_mixing <- ggplot(m.df.mixedDated, aes(year, as.Date(value, origin = as.Date('2019-01-01')), col = variable)) +
+  geom_point(size = 1) + 
+  ylab('First mixing day of the year') + 
   # geom_text(data = df.mixedDated2, aes(year, null, label = (null)))+
   facet_wrap(~ id)+
-  scale_color_manual(values = col_blues(13))+
+  scale_color_manual(values = col_blues(13)) +
+  scale_y_date(labels = date_format("%b"), breaks = 'month') +
   theme_minimal()+
-  theme(legend.position = 'bottom');g_mixing
+  theme(legend.position = 'bottom',
+        axis.title.x = element_blank());g_mixing
+
 ggsave('figs/firstMixingdays.png', g_mixing,  dpi = 300,width = 250,height = 150, units = 'mm')
 
 library("scatterplot3d")
