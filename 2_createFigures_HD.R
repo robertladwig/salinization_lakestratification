@@ -103,6 +103,154 @@ m.df.icedur = a %>% mutate(year = if_else(month(datetime) >= 10, year(datetime)+
   
 m.df.icedur$variable = factor(m.df.icedur$variable, levels = c('null','0.1','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10'))
 
+################################################################################################
+############ PLOTTING ############
+################################################################################################
+theme_custom = theme_bw(base_size = 8) +
+  theme(legend.position = 'bottom',
+        legend.key.width = unit(0.2,'cm'), 
+        legend.key.height = unit(0.2,'cm'), 
+        axis.title.x = element_blank()) 
+
+#### Density timeseries plot ####
+g_density <- ggplot(m.df) +
+  geom_hline(yintercept = 1.1, linetype = 'dashed', size = 0.2) +
+  geom_line(aes(datetime, (value), col = variable), size = 0.2) +
+  ylab(bquote(Density~Difference ~ (g~kg^-1))) +
+  facet_wrap(~ id)+
+  scale_color_manual(values = col_blues(13), name = bquote(Salt~Scenario ~ (g~kg^-1))) +
+  ylim(0,7.5)+
+  theme_custom +
+  guides(color=guide_legend(nrow=2,byrow=TRUE)); g_density
+ggsave('figs_HD/densitydiff.png', g_density,  dpi = 500, width = 165,height = 90, units = 'mm')
+
+
+#### Ice Plot ####
+g <- ggplot(m.df_ice %>% filter(datetime > as.Date('2013-12-30'))) +
+  geom_line(aes(datetime, (value), col = variable), size = 0.2) +
+  ylab('Ice Thickness (m)') +
+  xlab('') +
+  facet_wrap(~ id, ncol=1)+scale_color_manual(values = col_blues(13))+
+  # ylim(0,7.5)+
+  # geom_hline(yintercept = 1.1, linetype = 'dashed') +
+  theme_custom +
+  guides(color=guide_legend(nrow=2,byrow=TRUE)); g
+
+ggsave('figs_HD/ice.png', g,  dpi = 500, width = 165, height = 120, units = 'mm')
+
+
+#### Mixing day plot ####
+g_mixing <- ggplot(m.df.mixedDated, aes(year, as.Date(value, origin = as.Date('2019-01-01')), col = variable)) +
+  geom_point(size = 1) + 
+  ylab('First mixing day of the year') + 
+  # geom_text(data = df.mixedDated2, aes(year, null, label = (null)))+
+  facet_wrap(~ id) +
+  scale_color_manual(values = col_blues(13), name = bquote(Salt~Scenario ~ (g~kg^-1))) +
+  scale_y_date(labels = date_format("%b"), breaks = 'month') +
+  theme_custom +
+  guides(color=guide_legend(nrow=2,byrow=TRUE)); g_mixing
+ggsave('figs_HD/firstMixingdays.png', g_mixing, dpi = 500, width = 165,height = 90, units = 'mm')
+
+#### Schdmit Scaled Plot ####
+g <- ggplot(m.df_ssi_scaled) +
+  geom_line(aes(datetime, (value), col = variable), size = 0.2) +
+  ylab(bquote(SSI~normalized~on~null ~ (J~m^-2))) +
+  ylim(-70,300)+
+  facet_wrap(~ id, ncol = 1)+
+  scale_color_manual(values = col_blues(13), name = bquote(Salt~Scenario ~ (g~kg^-1))) +
+  theme_custom +
+  guides(color=guide_legend(nrow=2,byrow=TRUE)); g
+ggsave('figs_HD/schmidtensemble_scaled.png', g,  dpi = 500, width = 165,height = 120, units = 'mm')
+
+# Two years 
+g <- ggplot(subset(m.df_ssi, datetime > '2013-12-30')) +
+  geom_line(aes(datetime, (value), col = variable), size = 0.2) +
+  ylab(bquote(SSI~normalized~on~null ~ (J~m^-2))) +
+  ylim(-70,900)+
+  facet_wrap(~ id, ncol =1)+
+  scale_color_manual(values = col_blues(13), name = bquote(Salt~Scenario ~ (g~kg^-1))) +
+  theme_custom +
+  guides(color=guide_legend(nrow=2,byrow=TRUE)); g
+ggsave('figs_HD/schmidtensemble.png', g,  dpi = 500, width = 165,height = 120, units = 'mm')
+
+#### Cumulative density differences ####
+g <- ggplot(df.count) +
+  geom_line(aes(datetime, (value), col = variable)) +
+  ylab('Cum. # of mixed days, density diff <= 0.1 [d]') +
+  xlab('') +
+  facet_wrap(~ id) +
+  scale_color_manual(values = col_blues(13), name = bquote(Salt~Scenario ~ (g~kg^-1))) +
+  theme_custom +
+  guides(color=guide_legend(nrow=2,byrow=TRUE)); g
+ggsave('figs_HD/cumMixedDays.png', g, dpi = 500, width = 165, height = 90, units = 'mm')
+
+### Summer stratification duration ####
+
+g_summerstrat <- ggplot(m.df.stratdur, aes(year, value, col = variable)) +
+  geom_point(size = 1) + 
+  ylab('Summer stratification duration') + xlab('') +
+  facet_wrap(~ id)+
+  scale_color_manual(values = col_blues(13), name = bquote(Salt~Scenario ~ (g~kg^-1))) +
+  theme_custom +
+  guides(color=guide_legend(nrow=2,byrow=TRUE)); g_summerstrat
+
+ggsave('figs_HD/Summerstratdur.png', g_summerstrat,  dpi = 500, width = 165, height = 90, units = 'mm')
+
+g_summerstrat <- ggplot(m.df.stratdur, aes(variable, value, fill = variable)) +
+  geom_path(aes(variable, value, group = year, col = variable), size = 0.2) +
+  geom_point(size = 1.2, shape = 21, stroke = 0.1, alpha = 0.8) + 
+  ylab('Summer stratification duration') + 
+  xlab(bquote(Salt~Scenario ~ (g~kg^-1))) +
+  facet_wrap(~ id)+
+  scale_color_manual(values = col_blues(13), name = bquote(Salt~Scenario ~ (g~kg^-1))) +
+  scale_fill_manual(values = col_blues(13), name = bquote(Salt~Scenario ~ (g~kg^-1))) +
+  theme_bw(base_size = 8) +
+  theme(legend.position = 'none'); g_summerstrat
+ggsave('figs_HD/Summerstratdur_salt.png', g_summerstrat,  dpi = 500, width = 165, height = 90, units = 'mm')
+
+### Ice duration plot ####
+
+g_icestrat <- ggplot(m.df.icedur, aes(variable, value, fill = variable)) +
+  geom_line(aes(variable, value, group = year, col = variable), size = 0.2) +
+  geom_point(size = 1.2, shape = 21, stroke = 0.1, alpha = 0.8) + 
+  ylab('Ice duration') + xlab('') +
+  # geom_text(data = df.mixedDated2, aes(year, null, label = (null)))+
+  facet_wrap(~ id)+
+  scale_color_manual(values = col_blues(13), name = bquote(Salt~Scenario ~ (g~kg^-1))) +
+  scale_fill_manual(values = col_blues(13), name = bquote(Salt~Scenario ~ (g~kg^-1))) +
+  theme_bw(base_size = 8) +
+  theme(legend.position = 'none'); g_icestrat
+
+ggsave('figs_HD/iceduration.png', g_icestrat, dpi = 500, width = 165, height = 90, units = 'mm')
+
+
+# Patchwork
+g <- g_density / g_mixing / g_summerstrat / g_icestrat + plot_layout(guides = 'collect') +
+  plot_annotation(tag_levels = 'A') + theme_minimal() & theme(legend.position = 'bottom'); g
+
+ggsave('figs_HD/scenarios.png', g,  dpi = 500, width = 165,height = 250, units = 'mm')
+
+
+# Approach
+time = rep(seq(1,12,1),5)
+time = c('Jan', 'Feb', "Mar", 'Apr', "May","May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov",'Nov', "Dec")
+scenario = ifelse(time %in% c(12,1,2,3,4), 1, 0.1)
+scenario = ifelse(time %in% c('Dec',"Jan",'Feb',"Mar","Apr"), 1, 0.1)
+scenario = c(1, 1, 1, 1, 1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 1,1)
+df.frame = data.frame('time' = factor(time, levels = unique(time)), 'data' = scenario)
+
+g1 = ggplot(df.frame) +
+  geom_line( aes(time, data, group =  'Scenario' )) + 
+  geom_line( aes(time, data * 0, group =  'Null' ), linetype = 'dashed') + 
+  geom_line( aes(time, data * 0 + 0.1, group =  'Background' ), linetype = 'dashed') + 
+  annotate('text', x = 2.25, y = 0.05, label = 'Null', hjust = 0) +
+  annotate('text', x = 2.25, y = 0.15, label = 'Background', hjust = 0) +
+  annotate('text', x = 2.25, y = 0.95, label = 'Scenario', hjust = 0) +
+  ylab(bquote(Salt~load ~ (g~kg^-1))) +
+  ylim(0,1.0) +
+  theme_minimal(base_size = 8) + 
+  theme(axis.text.y =element_blank(), axis.ticks.y = element_blank()); g1
+ggsave('figs_HD/Approach.png', g1, dpi = 500, width = 165, height = 70, units = 'mm')
 
 
 
