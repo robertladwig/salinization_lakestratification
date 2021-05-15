@@ -58,7 +58,7 @@ resMCMC <- parLapply(clust, model, function(m) {
 })
 stopCluster(clust)
 
-save(resMCMC, file = 'cal_LHC_5000_April13.RData')
+save(resMCMC, file = 'cal_LHC_5000_May10.RData')
 
 resMCMC[[1]]$GLM$bestpar
 pairs(resMCMC[[1]]$GLM)

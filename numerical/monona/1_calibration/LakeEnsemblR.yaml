@@ -53,28 +53,28 @@ scaling_factors:                                # scaling factors to apply to me
       wind_speed: 1.0
       swr: 1.0
    GLM:
-      wind_speed: 0.80458
-      swr: 0.83803
+      wind_speed: 0.81766
+      swr: 0.91061
    GOTM:
-      wind_speed: 1.1905
-      swr: 1.148
+      wind_speed: 1.1259
+      swr: 1.1652
    Simstrat:
-      wind_speed: 1.169
-      swr: 0.81609
+      wind_speed: 1.0099
+      swr: 0.819
 model_parameters:
    FLake:                                       # FLake specific parameters
       fetch_lk: 2000.0                          # typical wind fetch [m]
    GLM:                                         # GLM specific parameters
       bsn_len: 3678                             # length of the lake basin, at crest height [m]
       bsn_wid: 944                              # width of the lake basin, at crest height [m]
-      mixing/coef_mix_hyp: 0.77976
-      mixing/coef_mix_KH: 0.13165
-      meteorology/ch: 0.0029885
+      mixing/coef_mix_hyp: 0.1148
+      mixing/coef_mix_KH: 0.18869
+      meteorology/ch: 0.0019896
    GOTM:                                        # GOTM specific parameters
-      k_min: 1.9597e-06             # minimum turbulent kinetic energy [m^2/s^2; min=0.0]
-      g2/constant_value: 3.255
+      k_min: 1.1514e-06            # minimum turbulent kinetic energy [m^2/s^2; min=0.0]
+      g2/constant_value: 3.4451
    Simstrat:                                    # Simstrat specific parameters
-      a_seiche: 0.00019143
+      a_seiche: 0.00029428
    MyLake:                                      # MyLake specific parameters
       Phys.par/C_shelter: 0.15                  # wind sheltering coefficient [min=0; max=1; if not specified, C_shelter=1.0-exp(-0.3*surface_area)]
 calibration:                                    # calibration section

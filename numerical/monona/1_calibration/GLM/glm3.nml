@@ -13,9 +13,9 @@
    coef_wind_stir = 0.23
    coef_mix_shear = 0.51
    coef_mix_turb = 0.3
-   coef_mix_KH = 0.1142,
+   coef_mix_KH = 0.18869,
    deep_mixing = 2
-   coef_mix_hyp = 0.70977,
+   coef_mix_hyp = 0.1148,
    diff = 0
 /
 &morphometry
@@ -68,7 +68,7 @@
    rh_factor = 1
    rain_factor = 1
    ce = 0.0013
-   ch = 0.0017971,
+   ch = 0.0019896,
    cd = 0.0013
    rain_threshold = 0.01
    runoff_coef = 0.3
