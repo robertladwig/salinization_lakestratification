@@ -2,7 +2,6 @@ setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 
 # Load LakeEnsemblR
 library(LakeEnsemblR)
-
 # Load libraries for post-processing
 library(tidyverse)
 library(lubridate)
@@ -13,7 +12,6 @@ library(colorspace)
 library(patchwork)
 library(scales)
 library(zoo)
-
 
 # Read in data 
 read.custom <- function(csv){
@@ -37,7 +35,6 @@ m.df <- reshape2::melt(df, id = c('datetime', 'id'))
 m.df_ice <- reshape2::melt(df_ice, id = c('datetime', 'id'))
 m.df_wtr <- reshape2::melt(df_wtr, id = c('datetime', 'id'))
 m.df_ssi <- reshape2::melt(df_ssi, id = c('datetime', 'id'))
-
 
 # Create dataframe for Schdmit normalized 
 df_ssi_scaled = df_ssi
@@ -63,7 +60,6 @@ df.count <- reshape2::melt(df.count, id = c('datetime', 'id'))
 l.df <- df %>% pivot_longer(cols = -c(datetime,id), names_to = 'salt', values_to = 'density')
 l.df_ice <- df_ice %>% pivot_longer(cols = -c(datetime,id), names_to = 'salt', values_to = 'ice')
 l.df_wtr <- df_wtr %>% pivot_longer(cols = -c(datetime,id), names_to = 'salt', values_to = 'wtr')
-# colnames(df_ssi) <- c('datetime','null','0.1','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10','id')
 l.df_ssi <- df_ssi %>% pivot_longer(cols = -c(datetime,id), names_to = 'salt', values_to = 'ssi')
 
 a = l.df %>% left_join(l.df_ice) %>% left_join(l.df_wtr) %>% left_join(l.df_ssi)
@@ -74,7 +70,6 @@ m.df.mixedDated = a %>% group_by(id, year = year(datetime), salt) %>%
   select(year, id, variable = salt, value = yday)
 m.df.mixedDated$variable = factor(m.df.mixedDated$variable, levels = c('null','0.1','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10'))
 
-
 library("scatterplot3d")
 scatterplot3d(x = m.df.mixedDated$year, y= m.df.mixedDated$variable, z= m.df.mixedDated$value,
               # color = col_vector[1:n],
@@ -82,7 +77,6 @@ scatterplot3d(x = m.df.mixedDated$year, y= m.df.mixedDated$variable, z= m.df.mix
 
 #### Create dataframe for stratfication duration ####
 m.df.stratdur = a %>% group_by(id, year = year(datetime), salt) %>% 
-  arrange(year, id, salt) %>% 
   mutate(median6 = rollapply(density, width = 7, median, align = 'left', fill=NA)) %>% 
   filter(density >= 1e-1 & abs(wtr) >= 1 & ice == 0 & ssi > 0) %>% 
   filter(median6 > 1e-1) %>% 
@@ -94,7 +88,6 @@ m.df.stratdur$variable = factor(b$variable, levels = c('null','0.1','0.5','1','1
 #### Create dataframe for ice duration ####
 m.df.icedur = a %>% mutate(year = if_else(month(datetime) >= 10, year(datetime)+1, year(datetime))) %>% 
   group_by(id, year, salt) %>% 
-  arrange(year, id, salt) %>% 
   filter(ice != 0) %>%
   summarise(iceduration = n()) %>% 
   select(year, id, variable = salt, value = iceduration)
@@ -249,6 +242,3 @@ g1 = ggplot(df.frame) +
   theme_minimal(base_size = 8) + 
   theme(axis.text.y =element_blank(), axis.ticks.y = element_blank()); g1
 ggsave('figs_HD/Approach.png', g1, dpi = 500, width = 165, height = 70, units = 'mm')
-
-
-
