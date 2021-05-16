@@ -83,7 +83,7 @@ m.df.stratdur = a %>% group_by(id, year = year(datetime), salt) %>%
   summarize(min.d = first(yday(datetime)), max.d = last(yday(datetime))) %>% 
   mutate(duration = max.d - min.d) %>% 
   select(year, id, variable = salt, value = duration)
-m.df.stratdur$variable = factor(b$variable, levels = c('null','0.1','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10'))
+m.df.stratdur$variable = factor(m.df.stratdur$variable, levels = c('null','0.1','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10'))
 
 #### Create dataframe for ice duration ####
 m.df.icedur = a %>% mutate(year = if_else(month(datetime) >= 10, year(datetime)+1, year(datetime))) %>% 
@@ -132,7 +132,7 @@ ggsave('figs_HD/ice.png', g,  dpi = 500, width = 165, height = 120, units = 'mm'
 
 #### Mixing day plot ####
 g_mixing <- ggplot(m.df.mixedDated, aes(year, as.Date(value, origin = as.Date('2019-01-01')), col = variable)) +
-  geom_point(size = 1) + 
+  geom_point(size = 1, show.legend = FALSE) + 
   ylab('First mixing day of the year') + 
   # geom_text(data = df.mixedDated2, aes(year, null, label = (null)))+
   facet_wrap(~ id) +
@@ -189,7 +189,7 @@ ggsave('figs_HD/Summerstratdur.png', g_summerstrat,  dpi = 500, width = 165, hei
 
 g_summerstrat <- ggplot(m.df.stratdur, aes(variable, value, fill = variable)) +
   geom_path(aes(variable, value, group = year, col = variable), size = 0.2) +
-  geom_point(size = 1.2, shape = 21, stroke = 0.1, alpha = 0.8) + 
+  geom_point(size = 1.2, shape = 21, stroke = 0.1, alpha = 0.8, show.legend = FALSE) + 
   ylab('Summer stratification duration') + 
   xlab(bquote(Salt~Scenario ~ (g~kg^-1))) +
   facet_wrap(~ id)+
@@ -203,7 +203,7 @@ ggsave('figs_HD/Summerstratdur_salt.png', g_summerstrat,  dpi = 500, width = 165
 
 g_icestrat <- ggplot(m.df.icedur, aes(variable, value, fill = variable)) +
   geom_line(aes(variable, value, group = year, col = variable), size = 0.2) +
-  geom_point(size = 1.2, shape = 21, stroke = 0.1, alpha = 0.8) + 
+  geom_point(size = 1.2, shape = 21, stroke = 0.1, alpha = 0.8,  show.legend = FALSE) + 
   ylab('Ice duration') + xlab('') +
   # geom_text(data = df.mixedDated2, aes(year, null, label = (null)))+
   facet_wrap(~ id)+
