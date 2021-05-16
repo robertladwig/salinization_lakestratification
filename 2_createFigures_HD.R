@@ -188,7 +188,7 @@ g_summerstrat <- ggplot(m.df.stratdur, aes(year, value, col = variable)) +
 ggsave('figs_HD/Summerstratdur.png', g_summerstrat,  dpi = 500, width = 165, height = 90, units = 'mm')
 
 g_summerstrat <- ggplot(m.df.stratdur, aes(variable, value, fill = variable)) +
-  geom_path(aes(variable, value, group = year, col = variable), size = 0.2) +
+  geom_line(aes(variable, value, group = year, col = variable), size = 0.2, , show.legend = FALSE) +
   geom_point(size = 1.2, shape = 21, stroke = 0.1, alpha = 0.8, show.legend = FALSE) + 
   ylab('Summer stratification duration') + 
   xlab(bquote(Salt~Scenario ~ (g~kg^-1))) +
@@ -202,9 +202,10 @@ ggsave('figs_HD/Summerstratdur_salt.png', g_summerstrat,  dpi = 500, width = 165
 ### Ice duration plot ####
 
 g_icestrat <- ggplot(m.df.icedur, aes(variable, value, fill = variable)) +
-  geom_line(aes(variable, value, group = year, col = variable), size = 0.2) +
-  geom_point(size = 1.2, shape = 21, stroke = 0.1, alpha = 0.8,  show.legend = FALSE) + 
-  ylab('Ice duration') + xlab('') +
+  geom_line(aes(variable, value, group = year, col = variable), size = 0.2, show.legend = FALSE) +
+  geom_point(size = 1.2, shape = 21, stroke = 0.1, alpha = 0.8, show.legend = FALSE) + 
+  ylab('Ice duration (days)') + 
+  xlab(bquote(Salt~Scenario ~ (g~kg^-1))) +
   # geom_text(data = df.mixedDated2, aes(year, null, label = (null)))+
   facet_wrap(~ id)+
   scale_color_manual(values = col_blues(13), name = bquote(Salt~Scenario ~ (g~kg^-1))) +
@@ -216,8 +217,10 @@ ggsave('figs_HD/iceduration.png', g_icestrat, dpi = 500, width = 165, height = 9
 
 
 # Patchwork
-g <- g_density / g_mixing / g_summerstrat / g_icestrat + plot_layout(guides = 'collect') +
-  plot_annotation(tag_levels = 'A') + theme_minimal() & theme(legend.position = 'bottom'); g
+g <- g_density / g_mixing / g_summerstrat / g_icestrat + 
+  plot_layout(guides = 'collect') +
+  plot_annotation(tag_levels = 'A', tag_suffix = ')') & 
+  theme(legend.position = 'bottom', plot.tag = element_text(size = 8)); g
 
 ggsave('figs_HD/scenarios.png', g,  dpi = 500, width = 165,height = 250, units = 'mm')
 
