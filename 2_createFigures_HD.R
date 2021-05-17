@@ -26,6 +26,7 @@ df = read.custom('output/density.csv')
 df_wtr <- read.custom('output/wtemp.csv')
 df_ssi <- read.custom('output/ssi.csv')
 df_ice <- read.custom('output/ice.csv')
+df_lakenumber <- read.custom('output/lakenumber.csv')
 
 # Color scale
 col_blues <- colorRampPalette(c("gray",'cyan', "darkblue", 'red1','red4'))
@@ -35,6 +36,7 @@ m.df <- reshape2::melt(df, id = c('datetime', 'id'))
 m.df_ice <- reshape2::melt(df_ice, id = c('datetime', 'id'))
 m.df_wtr <- reshape2::melt(df_wtr, id = c('datetime', 'id'))
 m.df_ssi <- reshape2::melt(df_ssi, id = c('datetime', 'id'))
+m.df.lakenumber <- reshape2::melt(df_lakenumber, id = c('datetime', 'id'))
 
 # Create dataframe for Schdmit normalized 
 df_ssi_scaled = df_ssi
@@ -61,8 +63,9 @@ l.df <- df %>% pivot_longer(cols = -c(datetime,id), names_to = 'salt', values_to
 l.df_ice <- df_ice %>% pivot_longer(cols = -c(datetime,id), names_to = 'salt', values_to = 'ice')
 l.df_wtr <- df_wtr %>% pivot_longer(cols = -c(datetime,id), names_to = 'salt', values_to = 'wtr')
 l.df_ssi <- df_ssi %>% pivot_longer(cols = -c(datetime,id), names_to = 'salt', values_to = 'ssi')
+l.df_lakenumber <- df_lakenumber %>% pivot_longer(cols = -c(datetime,id), names_to = 'salt', values_to = 'ln')
 
-a = l.df %>% left_join(l.df_ice) %>% left_join(l.df_wtr) %>% left_join(l.df_ssi)
+a = l.df %>% left_join(l.df_ice) %>% left_join(l.df_wtr) %>% left_join(l.df_ssi) %>% left_join(l.df_lakenumber)
 
 m.df.mixedDated = a %>% group_by(id, year = year(datetime), salt) %>% 
   filter(density <= 1e-1 & abs(wtr) <= 1 & ice == 0) %>% 
@@ -93,6 +96,10 @@ m.df.icedur = a %>% mutate(year = if_else(month(datetime) >= 10, year(datetime)+
   select(year, id, variable = salt, value = iceduration)
   
 m.df.icedur$variable = factor(m.df.icedur$variable, levels = c('null','0.1','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10'))
+
+m.df.lakenumber = a %>% mutate(year = year(datetime), month = month(datetime)) %>%
+  select(datetime, id, variable = salt, value = ln, month)
+m.df.lakenumber$variable = factor(m.df.lakenumber$variable, levels = c('null','0.1','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10'))
 
 ################################################################################################
 ############ PLOTTING ############
@@ -229,6 +236,16 @@ g_icestrat <- ggplot(m.df.icedur, aes(variable, value, fill = variable)) +
 
 ggsave('figs_HD/iceduration.png', g_icestrat, dpi = 500, width = 165, height = 90, units = 'mm')
 
+g_lakenumber <- ggplot(subset(m.df.lakenumber, month >3 & month < 6)) +
+  geom_hline(yintercept = 1.0, linetype = 'dashed', size = 0.2) +
+  geom_line(aes(datetime, (value), col = variable), size = 0.2) +
+  ylab('Lake Number') + 
+  facet_wrap(~ id)+
+  scale_color_manual(values = col_blues(13), name = bquote(Salt~Scenario ~ (g~kg^-1))) +
+  ylim(0,7.5)+
+  theme_custom +
+  guides(color=guide_legend(nrow=2,byrow=TRUE)); g_lakenumber
+ggsave('figs_HD/Lakenumber.png', g_lakenumber,  dpi = 500, width = 165, height = 90, units = 'mm')
 
 # Patchwork
 g <- g_density / g_mixing_hd / g_summerstrat / g_icestrat + 

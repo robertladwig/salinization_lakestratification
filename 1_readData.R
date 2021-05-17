@@ -15,6 +15,13 @@ for (lake.id in lakes){
   bathy <- read.csv(paste0('numerical/',lake.id,'/3_scenarios/1_null/LakeEnsemblR_bathymetry_standard.csv'))
   colnames(bathy) <- c("depths", "areas")
   
+  meteo <- read.csv(paste0('numerical/',lake.id,'/3_scenarios/1_null/LakeEnsemblR_meteo_standard.csv'))
+  wind <- data.frame('datetime' = meteo$datetime, 'wnd' = meteo$Ten_Meter_Elevation_Wind_Speed_meterPerSecond) %>%
+    group_by(date(datetime)) %>%
+    dplyr::summarise(mean = mean(wnd)) %>%
+    dplyr::rename(datetime = `date(datetime)`, wnd = mean)
+  wind$datetime <- as.POSIXct(wind$datetime)
+  
   ncdf_null <- paste0('numerical/',lake.id,'/3_scenarios/1_null/output/ensemble_output.nc')
   wtr_null <- load_var(ncdf = ncdf_null, var = "temp")
   density_null <- load_var(ncdf = ncdf_null, var = "dens")
@@ -344,6 +351,77 @@ for (lake.id in lakes){
     )
     df_ssi$id = lake.id
     
+    df_ln <- data.frame('datetime' = wtr_null$GLM$datetime,
+                        'ln_null' = apply(cbind(
+                          lapply(wtr_null, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GLM$lake.number, 
+                          lapply(wtr_null, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GOTM$lake.number,
+                          lapply(wtr_null, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$Simstrat$lake.number),
+                          1, function(x) mean(x, na.rm = TRUE)),
+                        'ln_01' = apply(cbind(
+                          lapply(wtr_01, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GLM$lake.number, 
+                          lapply(wtr_01, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GOTM$lake.number,
+                          lapply(wtr_01, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$Simstrat$lake.number),
+                          1, function(x) mean(x, na.rm = TRUE)),
+                        'ln_05' = apply(cbind(
+                          lapply(wtr_05, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GLM$lake.number, 
+                          lapply(wtr_05, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GOTM$lake.number,
+                          lapply(wtr_05, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$Simstrat$lake.number),
+                          1, function(x) mean(x, na.rm = TRUE)),
+                        'ln_1' = apply(cbind(
+                          lapply(wtr_1, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GLM$lake.number, 
+                          lapply(wtr_1, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GOTM$lake.number,
+                          lapply(wtr_1, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$Simstrat$lake.number),
+                          1, function(x) mean(x, na.rm = TRUE)),
+                        'ln_15' = apply(cbind(
+                          lapply(wtr_15, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GLM$lake.number, 
+                          lapply(wtr_15, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GOTM$lake.number,
+                          lapply(wtr_15, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$Simstrat$lake.number),
+                          1, function(x) mean(x, na.rm = TRUE)),
+                        'ln_2' = apply(cbind(
+                          lapply(wtr_2, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GLM$lake.number, 
+                          lapply(wtr_2, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GOTM$lake.number,
+                          lapply(wtr_2, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$Simstrat$lake.number),
+                          1, function(x) mean(x, na.rm = TRUE)),
+                        'ln_25' = apply(cbind(
+                          lapply(wtr_25, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GLM$lake.number, 
+                          lapply(wtr_25, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GOTM$lake.number,
+                          lapply(wtr_25, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$Simstrat$lake.number),
+                          1, function(x) mean(x, na.rm = TRUE)),
+                        'ln_3' = apply(cbind(
+                          lapply(wtr_3, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GLM$lake.number, 
+                          lapply(wtr_3, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GOTM$lake.number,
+                          lapply(wtr_3, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$Simstrat$lake.number),
+                          1, function(x) mean(x, na.rm = TRUE)),
+                        'ln_n35' = apply(cbind(
+                          lapply(wtr_35, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GLM$lake.number, 
+                          lapply(wtr_35, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GOTM$lake.number,
+                          lapply(wtr_35, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$Simstrat$lake.number),
+                          1, function(x) mean(x, na.rm = TRUE)),
+                        'ln_4' = apply(cbind(
+                          lapply(wtr_4, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GLM$lake.number, 
+                          lapply(wtr_4, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GOTM$lake.number,
+                          lapply(wtr_4, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$Simstrat$lake.number),
+                          1, function(x) mean(x, na.rm = TRUE)),
+                        'ln_45' = apply(cbind(
+                          lapply(wtr_45, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GLM$lake.number, 
+                          lapply(wtr_45, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GOTM$lake.number,
+                          lapply(wtr_45, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$Simstrat$lake.number),
+                          1, function(x) mean(x, na.rm = TRUE)),
+                        'ln_5' = apply(cbind(
+                          lapply(wtr_5, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GLM$lake.number, 
+                          lapply(wtr_5, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GOTM$lake.number,
+                          lapply(wtr_5, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$Simstrat$lake.number),
+                          1, function(x) mean(x, na.rm = TRUE)),
+                        'ln_10' = apply(cbind(
+                          lapply(wtr_10, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GLM$lake.number, 
+                          lapply(wtr_10, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GOTM$lake.number,
+                          lapply(wtr_10, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$Simstrat$lake.number),
+                          1, function(x) mean(x, na.rm = TRUE))
+    )
+    df_ln$id = lake.id
+    
+
+    
   } else {
     df2 <- data.frame('datetime' = wtr_null$GLM$datetime,
                       'dens_null' = apply(cbind(density_null$GLM$wtr_22 - density_null$GLM$wtr_2,
@@ -593,10 +671,80 @@ for (lake.id in lakes){
                             1, function(x) mean(x, na.rm = TRUE))
     )
     df_ssi2$id = lake.id
+    df_ln2 <- data.frame('datetime' = wtr_null$GLM$datetime,
+                        'ln_null' = apply(cbind(
+                          lapply(wtr_null, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GLM$lake.number, 
+                          lapply(wtr_null, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GOTM$lake.number,
+                          lapply(wtr_null, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$Simstrat$lake.number),
+                          1, function(x) mean(x, na.rm = TRUE)),
+                        'ln_01' = apply(cbind(
+                          lapply(wtr_01, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GLM$lake.number, 
+                          lapply(wtr_01, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GOTM$lake.number,
+                          lapply(wtr_01, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$Simstrat$lake.number),
+                          1, function(x) mean(x, na.rm = TRUE)),
+                        'ln_05' = apply(cbind(
+                          lapply(wtr_05, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GLM$lake.number, 
+                          lapply(wtr_05, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GOTM$lake.number,
+                          lapply(wtr_05, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$Simstrat$lake.number),
+                          1, function(x) mean(x, na.rm = TRUE)),
+                        'ln_1' = apply(cbind(
+                          lapply(wtr_1, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GLM$lake.number, 
+                          lapply(wtr_1, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GOTM$lake.number,
+                          lapply(wtr_1, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$Simstrat$lake.number),
+                          1, function(x) mean(x, na.rm = TRUE)),
+                        'ln_15' = apply(cbind(
+                          lapply(wtr_15, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GLM$lake.number, 
+                          lapply(wtr_15, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GOTM$lake.number,
+                          lapply(wtr_5, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$Simstrat$lake.number),
+                          1, function(x) mean(x, na.rm = TRUE)),
+                        'ln_2' = apply(cbind(
+                          lapply(wtr_2, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GLM$lake.number, 
+                          lapply(wtr_2, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GOTM$lake.number,
+                          lapply(wtr_2, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$Simstrat$lake.number),
+                          1, function(x) mean(x, na.rm = TRUE)),
+                        'ln_25' = apply(cbind(
+                          lapply(wtr_25, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GLM$lake.number, 
+                          lapply(wtr_25, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GOTM$lake.number,
+                          lapply(wtr_25, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$Simstrat$lake.number),
+                          1, function(x) mean(x, na.rm = TRUE)),
+                        'ln_3' = apply(cbind(
+                          lapply(wtr_3, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GLM$lake.number, 
+                          lapply(wtr_3, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GOTM$lake.number,
+                          lapply(wtr_3, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$Simstrat$lake.number),
+                          1, function(x) mean(x, na.rm = TRUE)),
+                        'ln_n35' = apply(cbind(
+                          lapply(wtr_35, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GLM$lake.number, 
+                          lapply(wtr_35, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GOTM$lake.number,
+                          lapply(wtr_35, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$Simstrat$lake.number),
+                          1, function(x) mean(x, na.rm = TRUE)),
+                        'ln_4' = apply(cbind(
+                          lapply(wtr_4, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GLM$lake.number, 
+                          lapply(wtr_4, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GOTM$lake.number,
+                          lapply(wtr_4, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$Simstrat$lake.number),
+                          1, function(x) mean(x, na.rm = TRUE)),
+                        'ln_45' = apply(cbind(
+                          lapply(wtr_45, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GLM$lake.number, 
+                          lapply(wtr_45, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GOTM$lake.number,
+                          lapply(wtr_45, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$Simstrat$lake.number),
+                          1, function(x) mean(x, na.rm = TRUE)),
+                        'ln_5' = apply(cbind(
+                          lapply(wtr_5, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GLM$lake.number, 
+                          lapply(wtr_5, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GOTM$lake.number,
+                          lapply(wtr_5, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$Simstrat$lake.number),
+                          1, function(x) mean(x, na.rm = TRUE)),
+                        'ln_10' = apply(cbind(
+                          lapply(wtr_10, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GLM$lake.number, 
+                          lapply(wtr_10, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$GOTM$lake.number,
+                          lapply(wtr_10, function(x) {ts.lake.number(wtr = x, wnd = wind, wnd.height = 10, bathy =  bathy)})$Simstrat$lake.number),
+                          1, function(x) mean(x, na.rm = TRUE))
+    )
+    df_ln2$id = lake.id
+    
     df = rbind(df, df2)
     df_wtr = rbind(df_wtr, df_wtr2)
     df_ssi = rbind(df_ssi, df_ssi2)
     df_ice <- rbind(df_ice, df_ice2)
+    df_ln <- rbind(df_ln, df_ln2)
   }
 }
 
@@ -604,4 +752,5 @@ write.csv(x = df, file = 'output/density.csv', quote = F, row.names = F)
 write.csv(x = df_wtr, file = 'output/wtemp.csv', quote = F, row.names = F)
 write.csv(x = df_ssi, file = 'output/ssi.csv', quote = F, row.names = F)
 write.csv(x = df_ice, file = 'output/ice.csv', quote = F, row.names = F)
+write.csv(x = df_ln, file = 'output/lakenumber.csv', quote = F, row.names = F)
 
