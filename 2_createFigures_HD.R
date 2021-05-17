@@ -111,11 +111,11 @@ m.df.icedur = a %>% mutate(year = if_else(month(datetime) >= 10, year(datetime)+
   
 m.df.icedur$variable = factor(m.df.icedur$variable, levels = c('null','0.1','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10'))
 
-m.df.icedur_scaled = a %>% mutate(year = if_else(month(datetime) >= 10, year(datetime)+1, year(datetime))) %>% 
-  group_by(id, year, salt) %>% 
-  filter(ice != 0) %>%
-  summarise(iceduration = n()) %>% 
-  select(year, id, variable = salt, value = iceduration)
+m.df.icedur %>% filter(variable == 'null')
+
+m.df.icedur_scaled = m.df.icedur %>% left_join(m.df.icedur %>% filter(variable == 'null') %>% select(-variable) %>% rename(null = value)) %>% 
+  mutate(value = value - null) %>% 
+  select(-null)
 
 m.df.icedur_scaled$variable = factor(m.df.icedur_scaled$variable, levels = c('null','0.1','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10'))
 
