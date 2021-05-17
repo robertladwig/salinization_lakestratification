@@ -38,10 +38,20 @@ m.df_wtr <- reshape2::melt(df_wtr, id = c('datetime', 'id'))
 m.df_ssi <- reshape2::melt(df_ssi, id = c('datetime', 'id'))
 m.df.lakenumber <- reshape2::melt(df_lakenumber, id = c('datetime', 'id'))
 
+# Create dataframe for ice normalized 
+df_ice_scaled = df_ice
+df_ice_scaled[,2:(ncol(df_ice)-1)] <- apply(as.matrix(df_ice[,2:(ncol(df_ice)-1)] ), 2, function(x) x-as.matrix(df_ice[,2:(ncol(df_ice)-1)] )[,1])
+m.df_ice_scaled <- reshape2::melt(df_ice_scaled, id = c('datetime', 'id'))
+
 # Create dataframe for Schdmit normalized 
 df_ssi_scaled = df_ssi
 df_ssi_scaled[,2:(ncol(df_ssi)-1)] <- apply(as.matrix(df_ssi[,2:(ncol(df_ssi)-1)] ), 2, function(x) x-as.matrix(df_ssi[,2:(ncol(df_ssi)-1)] )[,1])
 m.df_ssi_scaled <- reshape2::melt(df_ssi_scaled, id = c('datetime', 'id'))
+
+# Create dataframe for Lakenumber normalized
+df_lakenumber_scaled = df_lakenumber
+df_lakenumber_scaled[,2:(ncol(df_lakenumber)-1)] <- apply(as.matrix(df_lakenumber[,2:(ncol(df_lakenumber)-1)] ), 2, function(x) x-as.matrix(df_lakenumber[,2:(ncol(df_lakenumber)-1)] )[,1])
+m.df_lakenumber_scaled <- reshape2::melt(df_lakenumber_scaled, id = c('datetime', 'id'))
 
 #### Create cumulative density differences ####
 df.count <- df
@@ -64,8 +74,12 @@ l.df_ice <- df_ice %>% pivot_longer(cols = -c(datetime,id), names_to = 'salt', v
 l.df_wtr <- df_wtr %>% pivot_longer(cols = -c(datetime,id), names_to = 'salt', values_to = 'wtr')
 l.df_ssi <- df_ssi %>% pivot_longer(cols = -c(datetime,id), names_to = 'salt', values_to = 'ssi')
 l.df_lakenumber <- df_lakenumber %>% pivot_longer(cols = -c(datetime,id), names_to = 'salt', values_to = 'ln')
+l.df_lakenumber_scaled <- df_lakenumber_scaled %>% pivot_longer(cols = -c(datetime,id), names_to = 'salt', values_to = 'ln_scaled')
+l.df_ice_scaled <- df_ice_scaled %>% pivot_longer(cols = -c(datetime,id), names_to = 'salt', values_to = 'ice_scaled')
 
-a = l.df %>% left_join(l.df_ice) %>% left_join(l.df_wtr) %>% left_join(l.df_ssi) %>% left_join(l.df_lakenumber)
+
+a = l.df %>% left_join(l.df_ice) %>% left_join(l.df_wtr) %>% left_join(l.df_ssi) %>% left_join(l.df_lakenumber) %>% left_join(l.df_lakenumber_scaled) %>%
+  left_join(l.df_ice_scaled)
 
 m.df.mixedDated = a %>% group_by(id, year = year(datetime), salt) %>% 
   filter(density <= 1e-1 & abs(wtr) <= 1 & ice == 0) %>% 
@@ -97,9 +111,22 @@ m.df.icedur = a %>% mutate(year = if_else(month(datetime) >= 10, year(datetime)+
   
 m.df.icedur$variable = factor(m.df.icedur$variable, levels = c('null','0.1','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10'))
 
-m.df.lakenumber = a %>% mutate(year = year(datetime), month = month(datetime)) %>%
-  select(datetime, id, variable = salt, value = ln, month)
+m.df.icedur_scaled = a %>% mutate(year = if_else(month(datetime) >= 10, year(datetime)+1, year(datetime))) %>% 
+  group_by(id, year, salt) %>% 
+  filter(ice != 0) %>%
+  summarise(iceduration = n()) %>% 
+  select(year, id, variable = salt, value = iceduration)
+
+m.df.icedur_scaled$variable = factor(m.df.icedur_scaled$variable, levels = c('null','0.1','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10'))
+
+
+m.df.lakenumber = a %>% mutate(year = year(datetime), month = month(datetime), day = day(datetime)) %>%
+  select(datetime, id, variable = salt, value = ln, month, day)
 m.df.lakenumber$variable = factor(m.df.lakenumber$variable, levels = c('null','0.1','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10'))
+
+m.df_lakenumber_scaled = a %>% mutate(year = year(datetime), month = month(datetime), day = day(datetime)) %>%
+  select(datetime, id, variable = salt, value = ln_scaled, month, day)
+m.df_lakenumber_scaled$variable = factor(m.df_lakenumber_scaled$variable, levels = c('null','0.1','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10'))
 
 ################################################################################################
 ############ PLOTTING ############
@@ -236,7 +263,22 @@ g_icestrat <- ggplot(m.df.icedur, aes(variable, value, fill = variable)) +
 
 ggsave('figs_HD/iceduration.png', g_icestrat, dpi = 500, width = 165, height = 90, units = 'mm')
 
-g_lakenumber <- ggplot(subset(m.df.lakenumber, month >3 & month < 6)) +
+
+g_icestrat_scaled <- ggplot(m.df.icedur_scaled, aes(variable, value, fill = variable)) +
+  geom_line(aes(variable, value, group = year, col = variable), size = 0.2, show.legend = FALSE) +
+  geom_point(size = 1.2, shape = 21, stroke = 0.1, alpha = 0.8, show.legend = FALSE) + 
+  ylab('Ice duration normalized on null (days)') + 
+  xlab(bquote(Salt~Scenario ~ (g~kg^-1))) +
+  # geom_text(data = df.mixedDated2, aes(year, null, label = (null)))+
+  facet_wrap(~ id)+
+  scale_color_manual(values = col_blues(13), name = bquote(Salt~Scenario ~ (g~kg^-1))) +
+  scale_fill_manual(values = col_blues(13), name = bquote(Salt~Scenario ~ (g~kg^-1))) +
+  theme_bw(base_size = 8) +
+  theme(legend.position = 'none'); g_icestrat_scaled
+
+ggsave('figs_HD/iceduration_norm.png', g_icestrat_scaled, dpi = 500, width = 165, height = 90, units = 'mm')
+
+g_lakenumber <- ggplot(subset(m.df.lakenumber, month >=3 & month < 6& day %in% c(1,15,30))) +
   geom_hline(yintercept = 1.0, linetype = 'dashed', size = 0.2) +
   geom_line(aes(datetime, (value), col = variable), size = 0.2) +
   ylab('Lake Number') + 
@@ -247,8 +289,23 @@ g_lakenumber <- ggplot(subset(m.df.lakenumber, month >3 & month < 6)) +
   guides(color=guide_legend(nrow=2,byrow=TRUE)); g_lakenumber
 ggsave('figs_HD/Lakenumber.png', g_lakenumber,  dpi = 500, width = 165, height = 90, units = 'mm')
 
+g_lakenumber <- ggplot(subset(m.df_lakenumber_scaled, month >=3 & month < 6 ),#& day %in% c(1,15,30)),
+                       aes(variable, value, fill = variable)) +
+  geom_line(aes(variable, value, group = datetime, col = variable), size = 0.2, , show.legend = FALSE) +
+  geom_point(size = 1.2, shape = 21, stroke = 0.1, alpha = 0.8, show.legend = FALSE) + 
+  ylab('Lake Number normalized on null') + 
+  xlab(bquote(Salt~Scenario ~ (g~kg^-1))) +
+  geom_hline(yintercept = 1.0, linetype = 'dashed', size = 0.2) +
+  facet_wrap(~ id)+
+  ylim(0,2)+
+  scale_color_manual(values = col_blues(13), name = bquote(Salt~Scenario ~ (g~kg^-1))) +
+  scale_fill_manual(values = col_blues(13), name = bquote(Salt~Scenario ~ (g~kg^-1))) +
+  theme_bw(base_size = 8) +
+  theme(legend.position = 'none'); g_lakenumber
+ggsave('figs_HD/Lakenumber_salt.png', g_lakenumber,  dpi = 500, width = 165, height = 90, units = 'mm')
+
 # Patchwork
-g <- g_density / g_mixing_hd / g_summerstrat / g_icestrat + 
+g <- g_density / g_mixing_hd / g_summerstrat / g_icestrat / g_lakenumber+ 
   plot_layout(guides = 'collect') +
   plot_annotation(tag_levels = 'A', tag_suffix = ')') & 
   theme(legend.position = 'bottom', plot.tag = element_text(size = 8)); g
