@@ -135,12 +135,26 @@ g_mixing <- ggplot(m.df.mixedDated, aes(year, as.Date(value, origin = as.Date('2
   geom_point(size = 1, show.legend = FALSE) + 
   ylab('First mixing day of the year') + 
   # geom_text(data = df.mixedDated2, aes(year, null, label = (null)))+
+  # geom_text(aes(label = variable))+
+  # geom_hline(aes(yintercept = mean(as.Date(value, origin = as.Date('2019-01-01'))), col = variable, group = variable))+
   facet_wrap(~ id) +
   scale_color_manual(values = col_blues(13), name = bquote(Salt~Scenario ~ (g~kg^-1))) +
   scale_y_date(labels = date_format("%b"), breaks = 'month') +
   theme_custom +
   guides(color=guide_legend(nrow=2,byrow=TRUE)); g_mixing
 ggsave('figs_HD/firstMixingdays.png', g_mixing, dpi = 500, width = 165,height = 90, units = 'mm')
+
+g_mixing_hd <- ggplot(m.df.mixedDated, aes(variable,  as.Date(value, origin = as.Date('2019-01-01')), fill = variable)) +
+  geom_line(aes(variable,  as.Date(value, origin = as.Date('2019-01-01')), group = year, col = variable), size = 0.2, , show.legend = FALSE) +
+  geom_point(size = 1.2, shape = 21, stroke = 0.1, alpha = 0.8, show.legend = FALSE) + 
+  ylab('First mixing day of the year') + 
+  scale_y_date(labels = date_format("%b"), breaks = 'month') +
+  xlab(bquote(Salt~Scenario ~ (g~kg^-1))) +
+  facet_wrap(~ id)+
+  scale_color_manual(values = col_blues(13), name = bquote(Salt~Scenario ~ (g~kg^-1))) +
+  scale_fill_manual(values = col_blues(13), name = bquote(Salt~Scenario ~ (g~kg^-1))) +
+  theme_bw(base_size = 8) +
+  theme(legend.position = 'none'); g_mixing_hd
 
 #### Schdmit Scaled Plot ####
 g <- ggplot(m.df_ssi_scaled) +
@@ -217,7 +231,7 @@ ggsave('figs_HD/iceduration.png', g_icestrat, dpi = 500, width = 165, height = 9
 
 
 # Patchwork
-g <- g_density / g_mixing / g_summerstrat / g_icestrat + 
+g <- g_density / g_mixing_hd / g_summerstrat / g_icestrat + 
   plot_layout(guides = 'collect') +
   plot_annotation(tag_levels = 'A', tag_suffix = ')') & 
   theme(legend.position = 'bottom', plot.tag = element_text(size = 8)); g
