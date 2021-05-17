@@ -102,6 +102,12 @@ m.df.stratdur = a %>% group_by(id, year = year(datetime), salt) %>%
   select(year, id, variable = salt, value = duration)
 m.df.stratdur$variable = factor(m.df.stratdur$variable, levels = c('null','0.1','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10'))
 
+m.df.stratdur_scaled = m.df.stratdur %>% left_join(m.df.stratdur %>% filter(variable == 'null') %>% select(-variable) %>% rename(null = value)) %>% 
+  mutate(value = value - null) %>% 
+  select(-null)
+
+m.df.stratdur_scaled$variable = factor(m.df.stratdur_scaled$variable, levels = c('null','0.1','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10'))
+
 #### Create dataframe for ice duration ####
 m.df.icedur = a %>% mutate(year = if_else(month(datetime) >= 10, year(datetime)+1, year(datetime))) %>% 
   group_by(id, year, salt) %>% 
@@ -141,7 +147,7 @@ theme_custom = theme_bw(base_size = 8) +
 g_density <- ggplot(m.df) +
   geom_hline(yintercept = 1.1, linetype = 'dashed', size = 0.2) +
   geom_line(aes(datetime, (value), col = variable), size = 0.2) +
-  ylab(bquote(Density~Difference ~ (g~kg^-1))) +
+  ylab(bquote(Density~Difference ~ (kg~m^-3))) +
   facet_wrap(~ id)+
   scale_color_manual(values = col_blues(13), name = bquote(Salt~Scenario ~ (g~kg^-1))) +
   ylim(0,7.5)+
@@ -247,6 +253,20 @@ g_summerstrat <- ggplot(m.df.stratdur, aes(variable, value, fill = variable)) +
   theme(legend.position = 'none'); g_summerstrat
 ggsave('figs_HD/Summerstratdur_salt.png', g_summerstrat,  dpi = 500, width = 165, height = 90, units = 'mm')
 
+
+g_summerstrat_scaled <- ggplot(m.df.stratdur_scaled, aes(variable, value, fill = variable)) +
+  geom_line(aes(variable, value, group = year, col = variable), size = 0.2, , show.legend = FALSE) +
+  geom_point(size = 1.2, shape = 21, stroke = 0.1, alpha = 0.8, show.legend = FALSE) + 
+  ylab('Summer stratification duration normalized on null (days)') + 
+  ylab(expression(atop("Summer stratification duration", paste("normalized on null (days)")))) +
+  xlab(bquote(Salt~Scenario ~ (g~kg^-1))) +
+  facet_wrap(~ id)+
+  scale_color_manual(values = col_blues(13), name = bquote(Salt~Scenario ~ (g~kg^-1))) +
+  scale_fill_manual(values = col_blues(13), name = bquote(Salt~Scenario ~ (g~kg^-1))) +
+  theme_bw(base_size = 8) +
+  theme(legend.position = 'none'); g_summerstrat_scaled
+ggsave('figs_HD/Summerstratdur_salt_normalized.png', g_summerstrat_scaled,  dpi = 500, width = 165, height = 90, units = 'mm')
+
 ### Ice duration plot ####
 
 g_icestrat <- ggplot(m.df.icedur, aes(variable, value, fill = variable)) +
@@ -268,6 +288,7 @@ g_icestrat_scaled <- ggplot(m.df.icedur_scaled, aes(variable, value, fill = vari
   geom_line(aes(variable, value, group = year, col = variable), size = 0.2, show.legend = FALSE) +
   geom_point(size = 1.2, shape = 21, stroke = 0.1, alpha = 0.8, show.legend = FALSE) + 
   ylab('Ice duration normalized on null (days)') + 
+  ylab(expression(atop("Ice duration", paste("normalized on null (days)")))) +
   xlab(bquote(Salt~Scenario ~ (g~kg^-1))) +
   # geom_text(data = df.mixedDated2, aes(year, null, label = (null)))+
   facet_wrap(~ id)+
@@ -293,9 +314,10 @@ g_lakenumber <- ggplot(subset(m.df_lakenumber_scaled, month >=3 & month < 6 ),#&
                        aes(variable, value, fill = variable)) +
   geom_line(aes(variable, value, group = datetime, col = variable), size = 0.2, , show.legend = FALSE) +
   geom_point(size = 1.2, shape = 21, stroke = 0.1, alpha = 0.8, show.legend = FALSE) + 
-  ylab('Lake Number normalized on null') + 
+  # ylab('Spring Lake Number normalized on null') + 
+  ylab(expression(atop("Lake Number (March-May)", paste("normalized on null (-)")))) +
   xlab(bquote(Salt~Scenario ~ (g~kg^-1))) +
-  geom_hline(yintercept = 1.0, linetype = 'dashed', size = 0.2) +
+  # geom_hline(yintercept = 1.0, linetype = 'dashed', size = 0.2) +
   facet_wrap(~ id)+
   ylim(0,2)+
   scale_color_manual(values = col_blues(13), name = bquote(Salt~Scenario ~ (g~kg^-1))) +
@@ -305,7 +327,7 @@ g_lakenumber <- ggplot(subset(m.df_lakenumber_scaled, month >=3 & month < 6 ),#&
 ggsave('figs_HD/Lakenumber_salt.png', g_lakenumber,  dpi = 500, width = 165, height = 90, units = 'mm')
 
 # Patchwork
-g <- g_density / g_mixing_hd / g_summerstrat / g_icestrat / g_lakenumber+ 
+g <- g_density / g_mixing_hd / g_summerstrat_scaled / g_icestrat_scaled / g_lakenumber+ 
   plot_layout(guides = 'collect') +
   plot_annotation(tag_levels = 'A', tag_suffix = ')') & 
   theme(legend.position = 'bottom', plot.tag = element_text(size = 8)); g
@@ -333,3 +355,24 @@ g1 = ggplot(df.frame) +
   theme_minimal(base_size = 8) + 
   theme(axis.text.y =element_blank(), axis.ticks.y = element_blank()); g1
 ggsave('figs_HD/Approach.png', g1, dpi = 500, width = 165, height = 70, units = 'mm')
+
+
+
+## some comparison plots
+ncdf <- 'numerical/mendota/3_scenarios/1_null/output/ensemble_output.nc'
+model = c('GLM', 'GOTM', 'Simstrat')
+p1 <- plot_ensemble(ncdf, model = model,
+                    var = "temp", depth = 2,
+                    residuals = TRUE)
+p2 <- plot_ensemble(ncdf, model = model,
+                    var = "temp", depth = 22,
+                    residuals = TRUE)
+# Arrange the two plots above each other
+p <- p1[[1]] / p2[[1]] + #ggarrange(p1[[1]] + theme_light(),
+               #p2[[1]] + theme_light(), ncol = 1, nrow = 2) +
+  plot_layout(guides = 'collect') +
+  plot_annotation(tag_levels = 'A', tag_suffix = ')') & 
+  theme(legend.position = 'bottom', plot.tag = element_text(size = 8)); p
+ggsave('figs_HD/temp_ensemble.png', p,  dpi = 500, width = 250,height = 165, units = 'mm')
+
+# ggsave('output/ensemble_ts2m.png', p,  dpi = 300,width = 384,height = 180, units = 'mm')
