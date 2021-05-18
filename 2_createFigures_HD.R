@@ -329,10 +329,11 @@ ggsave('figs_HD/Lakenumber_salt.png', g_lakenumber,  dpi = 500, width = 165, hei
 # Patchwork
 g <- g_density / g_mixing_hd / g_summerstrat_scaled / g_icestrat_scaled / g_lakenumber+ 
   plot_layout(guides = 'collect') +
-  plot_annotation(tag_levels = 'A', tag_suffix = ')') & 
+  plot_annotation(tag_levels = 'A', tag_suffix = ')',
+                  title = 'Ensemble') & 
   theme(legend.position = 'bottom', plot.tag = element_text(size = 8)); g
 
-ggsave('figs_HD/scenarios.png', g,  dpi = 500, width = 165,height = 250, units = 'mm')
+ggsave('figs_HD/scenarios_Ensemble.png', g,  dpi = 500, width = 165,height = 250, units = 'mm')
 
 
 # Approach
@@ -363,7 +364,7 @@ ncdf <- 'numerical/mendota/3_scenarios/1_null/output/ensemble_output.nc'
 model = c('GLM', 'GOTM', 'Simstrat')
 p1 <- plot_ensemble(ncdf, model = model,
                     var = "temp", depth = 2,
-                    residuals = TRUE)
+                    residuals = TRUE) 
 p2 <- plot_ensemble(ncdf, model = model,
                     var = "temp", depth = 22,
                     residuals = TRUE)
@@ -371,8 +372,24 @@ p2 <- plot_ensemble(ncdf, model = model,
 p <- p1[[1]] / p2[[1]] + #ggarrange(p1[[1]] + theme_light(),
                #p2[[1]] + theme_light(), ncol = 1, nrow = 2) +
   plot_layout(guides = 'collect') +
-  plot_annotation(tag_levels = 'A', tag_suffix = ')') & 
-  theme(legend.position = 'bottom', plot.tag = element_text(size = 8)); p
+  plot_annotation(tag_levels = 'A', tag_suffix = ')')  & 
+  theme(legend.position = 'bottom', plot.tag = element_text(size = 8)) & theme_minimal(); p
 ggsave('figs_HD/temp_ensemble.png', p,  dpi = 500, width = 250,height = 165, units = 'mm')
+
+ncdf <- 'numerical/mendota/3_scenarios/3_constantsalt+2/output/ensemble_output.nc'
+model = c('GLM', 'GOTM', 'Simstrat')
+p1 <- plot_ensemble(ncdf, model = model,
+                    var = "salt", depth = 2,
+                    residuals = TRUE) 
+p2 <- plot_ensemble(ncdf, model = model,
+                    var = "salt", depth = 22,
+                    residuals = TRUE)
+# Arrange the two plots above each other
+p <- p1 / p2+ #ggarrange(p1[[1]] + theme_light(),
+  #p2[[1]] + theme_light(), ncol = 1, nrow = 2) +
+  plot_layout(guides = 'collect') +
+  plot_annotation(tag_levels = 'A', tag_suffix = ')')  & 
+  theme(legend.position = 'bottom', plot.tag = element_text(size = 8)) & theme_minimal(); p
+ggsave('figs_HD/salt_ensemble.png', p,  dpi = 500, width = 250,height = 165, units = 'mm')
 
 # ggsave('output/ensemble_ts2m.png', p,  dpi = 300,width = 384,height = 180, units = 'mm')
