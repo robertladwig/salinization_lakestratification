@@ -81,8 +81,9 @@ l.df_ice_scaled <- df_ice_scaled %>% pivot_longer(cols = -c(datetime,id), names_
 a = l.df %>% left_join(l.df_ice) %>% left_join(l.df_wtr) %>% left_join(l.df_ssi) %>% left_join(l.df_lakenumber) %>% left_join(l.df_lakenumber_scaled) %>%
   left_join(l.df_ice_scaled)
 
-m.df.mixedDated = a %>% group_by(id, year = year(datetime), salt) %>% 
-  filter(density <= 1e-1 & abs(wtr) <= 1 & ice == 0) %>% 
+m.df.mixedDated = a %>% mutate(ice_movavg = zoo::rollmean(ice, k = 90, fill = NA)) %>%
+  group_by(id, year = year(datetime), salt) %>% 
+  filter(density <= 1e-1 & abs(wtr) <= 1 & ice_movavg <= 1e-5) %>% 
   summarize(yday = first(yday(datetime))) %>% 
   select(year, id, variable = salt, value = yday)
 m.df.mixedDated$variable = factor(m.df.mixedDated$variable, levels = c('null','0.1','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10'))
@@ -157,7 +158,7 @@ ggsave('figs_HD/densitydiff.png', g_density,  dpi = 500, width = 165,height = 90
 
 
 #### Ice Plot ####
-g <- ggplot(m.df_ice %>% filter(datetime > as.Date('2013-12-30'))) +
+g <- ggplot(m.df_ice ) +#%>% filter(datetime > as.Date('2013-12-30'))) +
   geom_line(aes(datetime, (value), col = variable), size = 0.2) +
   ylab('Ice Thickness (m)') +
   xlab('') +
