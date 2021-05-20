@@ -27,7 +27,7 @@ sampling.sites.sf = st_as_sf(sampling.sites, coords = c("lon", "lat"),
                       crs = 4326)
 
 mapS = ggplot(lakes.S) +
-  annotation_map_tile(type = world_gray, zoom = 14) +
+  # annotation_map_tile(type = world_gray, zoom = 14) +
   # geom_sf(data = lakes.S, fill = alpha('lightsteelblue1',1), size = 0.2) +
   geom_sf(data = bathyME, fill = alpha('#bfd9e0',1), color = 'grey50', size = 0.1) +
   geom_sf(data = bathyMO, fill = alpha('#bfd9e0',1), color = 'grey50', size = 0.1) +
@@ -39,13 +39,13 @@ mapS = ggplot(lakes.S) +
                          # pad_x = unit(0.2, "in"), pad_y = unit(0.2, "in"),
                          height = unit(0.2,'in'), width = unit(0.4,'in'),
                          style = north_arrow_minimal) + # North Arrow
-  theme_bw(base_size = 8) +
+  theme_bw(base_size = 6) +
   theme(plot.background = element_rect(fill = "transparent", colour = NA),
         panel.background = element_rect(fill = "transparent",colour = NA),
         panel.grid.minor = element_blank(),
         panel.grid.major = element_blank(),
-        axis.title.x=element_blank(),axis.title.y=element_blank(),
-        axis.text.x = element_text(angle = 45, hjust = 1)) +
+        axis.title.x = element_blank(), axis.title.y = element_blank(),
+        axis.text.x = element_text(angle = 20, hjust = 1)) +
   # coord_sf(xlim = c(-89.71, -89.58), ylim = c(45.99, 46.04)) +
   NULL
 
@@ -92,13 +92,39 @@ cl1.mean = ggplot(me.dnr) +
         legend.box.background = element_rect(colour = "black"),
         legend.key.height =  unit(0.2,"cm"), 
         legend.key.width =  unit(0.2,"cm"), 
-        legend.position=c(.2,.85)); cl1.mean
+        legend.position=c(.2,.8)); cl1.mean
+
+cl.profiles = me.cl %>% filter(month(sampledate) <= 3) %>% 
+  filter(year4 > 2000) %>% 
+  mutate(lakename = if_else(lakeid == 'ME', 'Lake Mendota', 'Lake Monona')) %>% 
+  ggplot(.) +
+  geom_path(aes(x = cl, y = depth, group = year4), color = 'grey60', alpha = 0.5, size = 0.2) +
+  geom_point(aes(x = cl, y = depth, fill = lakeid), shape = 21) +
+  scale_fill_manual(values = c('#bfd9e0', '#cfd160'), name = 'Lake', labels = c('Mendota','Monona')) +
+  scale_color_manual(values = c('#bfd9e0', '#cfd160'), name = 'Lake', labels = c('Mendota','Monona')) +
+  scale_y_reverse() +
+  facet_wrap(~lakename, scales = 'free_x') +
+  ylab('Depth (m)') +
+  xlab(bquote('Chloride' ~ (mg~L^-1))) +
+  theme_bw(base_size = 8) +
+  theme(legend.position = 'none')
+
 
 mapS + cl1.mean +
   plot_annotation(tag_levels = 'a', tag_suffix = ')') &
   theme(plot.tag = element_text(size = 8))
 ggsave('chlorideData/Map_Mendota_Monona_Cl.mean.png', width = 6.5, height = 4, dpi = 500, bg = "transparent")
 
+layout <- "
+AAABBB
+AAABBB
+CCCCCC
+"
+mapS + cl.profiles + cl1.mean +
+  plot_layout(design = layout)  +
+  plot_annotation(tag_levels = 'a', tag_suffix = ')') &
+  theme(plot.tag = element_text(size = 8))
+ggsave('chlorideData/Map_Trend_Profiles.png', width = 6.5, height = 5, dpi = 500, bg = "transparent")
 
 
 ###### Density as a function of temperature #######
