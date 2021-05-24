@@ -261,6 +261,10 @@ g2 <- ggplot(m.out.contour, aes(x = Salt, y = Wind[value], col = variable)) +
   # ylab('Wind speed (m/s)')+
   ylab(bquote(Wind~Speed ~ (m~s^-1))) +
   scale_color_brewer(palette = 'Set1') +
+  geom_curve(aes(x = 30, y = 23, xend = 20, yend = 45), curvature = 0.5, arrow = arrow(length = unit(0.1, "cm")), color = 'grey50', size = 0.2) +
+  annotate(geom = 'text', label = 'turbulent', x = 32, y = 40, color = 'grey50', size = 2.5) +
+  geom_curve(aes(x = 30, y = 18, xend = 33, yend = 8), curvature = -0.5, arrow = arrow(length = unit(0.1, "cm")), color = 'grey50', size = 0.2) +
+  annotate(geom = 'text', label = 'stabilizing', x = 38, y = 13, color = 'grey50', size = 2.5) +
   ggtitle('Uniform 8°C')+
   geom_label_repel(aes(label = label),
                    nudge_x = 1,
