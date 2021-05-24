@@ -27,7 +27,7 @@ sampling.sites.sf = st_as_sf(sampling.sites, coords = c("lon", "lat"),
                       crs = 4326)
 
 mapS = ggplot(lakes.S) +
-  # annotation_map_tile(type = world_gray, zoom = 14) +
+  annotation_map_tile(type = world_gray, zoom = 14) +
   # geom_sf(data = lakes.S, fill = alpha('lightsteelblue1',1), size = 0.2) +
   geom_sf(data = bathyME, fill = alpha('#bfd9e0',1), color = 'grey50', size = 0.1) +
   geom_sf(data = bathyMO, fill = alpha('#bfd9e0',1), color = 'grey50', size = 0.1) +
