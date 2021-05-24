@@ -156,6 +156,16 @@ g_density <- ggplot(m.df) +
   guides(color=guide_legend(nrow=2,byrow=TRUE)); g_density
 ggsave('figs_HD/densitydiff.png', g_density,  dpi = 500, width = 165,height = 90, units = 'mm')
 
+g_density_08 <- ggplot(m.df) +
+  geom_hline(yintercept = 1.1, linetype = 'dashed', size = 0.2) +
+  geom_line(aes(datetime, (value), col = variable), size = 0.2) +
+  ylab(bquote(Density~Difference ~ (kg~m^-3))) +
+  facet_wrap(~ id)+
+  scale_color_manual(values = col_blues(13), name = bquote(Salt~Scenario ~ (g~kg^-1))) +
+  ylim(0,10) +
+  xlim(as.Date('2008-01-01'), as.Date('2010-07-01')) +
+  theme_custom +
+  guides(color=guide_legend(nrow=2,byrow=TRUE)); g_density_08
 
 #### Ice Plot ####
 g <- ggplot(m.df_ice ) +#%>% filter(datetime > as.Date('2013-12-30'))) +
