@@ -164,10 +164,11 @@ g1 <- ggplot(out, aes(V1, V3/V2)) +
   geom_vline(xintercept = as.numeric(opt.salt$par),linetype = 'dashed') +
   geom_hline(yintercept = 1,linetype = 'dashed') +
   # xlab('Uniformly added salt (g/kg) below center of volume')+
-  xlab('Salt (g/kg)')+
+  # xlab('Salt (g/kg)')+
+  xlab(bquote(Salinity ~ (g~kg^-1))) +
   ylab('LN (mass moment/wind moment)')+
   ggtitle('Spring conditions')+
-  theme_minimal(); g1
+  theme_minimal(base_size = 8); g1
 
 
 plot_salt_3d <- function(x, wtr.dat = 12, wsp.dat = 1, bath.data = bath.data){
@@ -253,16 +254,20 @@ m.out.contour = m.out.contour %>%
 
 g2 <- ggplot(m.out.contour, aes(x = Salt, y = Wind[value], col = variable)) +
   geom_line() +
-  geom_vline(xintercept = as.numeric(opt.salt$par),linetype = 'dashed') +
+  geom_vline(xintercept = as.numeric(opt.salt$par), linetype = 'dashed') +
   geom_hline(yintercept = 4.6,linetype = 'dashed') +
-  xlab('Salt (g/kg)')+
-  ylab('Wind speed (m/s)')+
-  ggtitle('Uniform 8 deg C')+
+  # xlab('Salt (g/kg)')+
+  xlab(bquote(Salinity ~ (g~kg^-1))) +
+  # ylab('Wind speed (m/s)')+
+  ylab(bquote(Wind~Speed ~ (m~s^-1))) +
+  scale_color_brewer(palette = 'Set1') +
+  ggtitle('Uniform 8°C')+
   geom_label_repel(aes(label = label),
                    nudge_x = 1,
-                   na.rm = TRUE) +
-  theme_minimal()+
+                   na.rm = TRUE, size = 2) +
+  theme_minimal(base_size = 8)+
   theme(legend.position = "none") ; g2
 
 g <- g1 + g2 + plot_annotation(tag_levels = 'A') ;g 
-ggsave(file = 'theoretical.png', g, dpi = 300, width = 6.5, height = 4.5, units = 'in')
+ggsave(file = 'theoretical.png', g, dpi = 500, width = 6.5, height = 2.5, units = 'in')
+
