@@ -564,9 +564,11 @@ g4 <- ggplot(subset(m.df_salt, variable == '1')) +
   geom_line(aes(datetime, (value), color = 'PSU difference'), size = 0.2) +
   ylab(bquote(PSU~Difference ~ (g~kg^-1))) +
   ylim(0,0.6)+
-  geom_line(data = subset(m.df_wtr, variable == '1'), aes(datetime, y = abs(value)/50,
+  xlim(as.Date('2014-01-01'), as.Date('2015-12-31')) +
+  geom_line(data = subset(m.df_wtr, variable == '1'), aes(datetime, y = abs(value)/30,
                                                           col = 'Temp. difference'), size = 0.2) +
-  scale_y_continuous(sec.axis = sec_axis(~.*60, name = "Temp. Differenc [K]")) +
+  geom_hline(yintercept = 1/30, linetype = 'dashed', size = 0.2) +
+  scale_y_continuous(sec.axis = sec_axis(~.*30, name = "Temp. Differenc [K]")) +
   facet_wrap(~ id, ncol=1)+
   # scale_color_manual(values = col_blues(13), name = bquote(Salt~Scenario ~ (g~kg^-1))) +
   theme_custom + 
