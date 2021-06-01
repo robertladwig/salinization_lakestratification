@@ -338,7 +338,7 @@ g_lakenumber <- ggplot(subset(m.df_lakenumber_scaled, month >=3 & month < 6 ),#&
 ggsave('figs_HD/Lakenumber_salt.png', g_lakenumber,  dpi = 500, width = 165, height = 90, units = 'mm')
 
 # Patchwork
-g <- g_density / g_mixing_hd / g_summerstrat_scaled / g_icestrat_scaled / g_lakenumber+ 
+g <- g_density / g_icestrat_scaled / g_mixing_hd  / g_lakenumber / g_summerstrat_scaled + 
   plot_layout(guides = 'collect') +
   plot_annotation(tag_levels = 'A', tag_suffix = ')',
                   title = 'Ensemble') & 
@@ -422,3 +422,115 @@ volume.monona <- pracma::trapz(hypso.monona$Depth_meter, hypso.monona$Area_meter
 print(paste0('residence time of Mendota is ', round(volume.monona/mean.monona/86400/365.25,2), ' years'))
 
 # ggsave('output/ensemble_ts2m.png', p,  dpi = 300,width = 384,height = 180, units = 'mm')
+
+
+### field monitoring data by linnea
+me_epi_1920 <- readRDS(file = 'fieldmonitoring/ME_EPI_2019-20.rds') %>% mutate('')
+me_hyp_1920 <- readRDS(file = 'fieldmonitoring/ME_HYPO_2019-20.rds')
+
+mo_epi_1920 <- readRDS(file = 'fieldmonitoring/MO_EPI_2019-20.rds')
+mo_hyp_1920 <- readRDS(file = 'fieldmonitoring/MO_HYPO_2019-20.rds')
+
+mo_epi_2021 <- readRDS(file = 'fieldmonitoring/MO_EPI_2020-21.rds')
+mo_hyp_2021 <- readRDS(file = 'fieldmonitoring/MO_HYPO_2020-21.rds')
+
+df_me <- merge(me_epi_1920, me_hyp_1920, by = 'date') %>%
+  mutate('tempgrad' = Temp.y - Temp.x,
+         'cond_2' = runningmean.x,
+         'cond_23.5' = runningmean.y,
+         'cl_2' = runningmean.x * 0.027856 + 35.386954,
+         'cl_23.5' = runningmean.x * 0.002530 + 49.023895) %>%
+  select(date, tempgrad, cond_2, cond_23.5, cl_2, cl_23.5)
+g1 <- ggplot(df_me) +
+  geom_line( aes(date, abs(tempgrad), col = 'Delta T')) +
+  ylab('Wtemp density [deg C/m]') +
+  geom_line(aes(date, y = cl_2/1000*20, colour = "Cl 2m")) +
+  geom_line(aes(date, y = cl_23.5/1000*20, colour = "Cl 23.5m")) +
+  scale_y_continuous(sec.axis = sec_axis(~./20, name = "PSU [g/kg]")) +
+  xlab('') +
+  ggtitle('Mendota 2019-2020')+
+  theme_minimal();g1
+
+df_mo19 <- merge(mo_epi_1920, mo_hyp_1920, by = 'date') %>%
+  mutate('tempgrad' = Temp.y - Temp.x,
+         'cond_2' = runningmean.x,
+         'cond_23.5' = runningmean.y,
+         'cl_2' = runningmean.x * -0.003770 + 68.159981,
+         'cl_23.5' = runningmean.x * 0.15281  - 8.75396) %>%
+  select(date, tempgrad, cond_2, cond_23.5, cl_2, cl_23.5)
+g2 <- ggplot(df_mo19) +
+  geom_line( aes(date, abs(tempgrad), col = 'Delta T')) +
+  ylab('Wtemp density [deg C/m]') +
+  geom_line(aes(date, y = cl_2/1000*20, colour = "Cl 2m")) +
+  geom_line(aes(date, y = cl_23.5/1000*20, colour = "Cl 23.5m")) +
+  scale_y_continuous(sec.axis = sec_axis(~./20, name = "PSU [g/kg]")) +
+  xlab('') +
+  ggtitle('Monona 2019-2020')+
+  theme_minimal();g2
+
+df_mo20 <- merge(mo_epi_2021, mo_hyp_2021, by = 'date') %>%
+  mutate('tempgrad' = Temp.y - Temp.x,
+         'cond_2' = runningmean.x,
+         'cond_23.5' = runningmean.y,
+         'cl_2' = runningmean.x * -0.003770 + 68.159981,
+         'cl_23.5' = runningmean.x * 0.15281  - 8.75396) %>%
+  select(date, tempgrad, cond_2, cond_23.5, cl_2, cl_23.5)
+g3 <- ggplot(df_mo20) +
+  geom_line( aes(date, abs(tempgrad), col = 'Delta T')) +
+  ylab('Wtemp density [deg C/m]') +
+  geom_line(aes(date, y = cl_2/1000*20, colour = "Cl 2m")) +
+  geom_line(aes(date, y = cl_23.5/1000*20, colour = "Cl 23.5m")) +
+  scale_y_continuous(sec.axis = sec_axis(~./20, name = "PSU [g/kg]")) +
+  xlab('') +
+  ggtitle('Monona 2020-2021')+
+  theme_minimal();g3
+
+p = g1 + g2 + g3 +
+  plot_layout(guides = 'collect') +
+  plot_annotation(tag_levels = 'A', tag_suffix = ')')  & theme_minimal()& 
+  theme(legend.position = 'bottom', plot.tag = element_text(size = 8)) ; p
+ggsave('figs_HD/fieldmonitoring_psu.png', p,  dpi = 500, width = 250,height = 130, units = 'mm')
+
+
+g1 <- ggplot(df_me) +
+  geom_line( aes(date, abs(tempgrad), col = 'Delta T')) +
+  ylab('Wtemp density [deg C/m]') +
+  geom_line(aes(date, y = cond_2/500, colour = "Cl 2m")) +
+  geom_line(aes(date, y = cond_23.5/500, colour = "Cl 23.5m")) +
+  scale_y_continuous(sec.axis = sec_axis(~.*500, name = "EC [uS/cm]")) +
+  xlab('') +
+  ggtitle('Mendota 2019-2020')+
+  theme_minimal();g1
+
+g2 <- ggplot(df_mo19) +
+  geom_line( aes(date, abs(tempgrad), col = 'Delta T')) +
+  ylab('Wtemp density [deg C/m]') +
+  geom_line(aes(date, y = cond_2/500, colour = "Cl 2m")) +
+  geom_line(aes(date, y = cond_23.5/500, colour = "Cl 23.5m")) +
+  scale_y_continuous(sec.axis = sec_axis(~.*500, name = "EC [uS/cm]")) +
+  xlab('') +
+  ggtitle('Monona 2019-2020')+
+  theme_minimal();g2
+
+g3 <- ggplot(df_mo20) +
+  geom_line( aes(date, abs(tempgrad), col = 'Delta T')) +
+  ylab('Wtemp density [deg C/m]') +
+  geom_line(aes(date, y = cond_2/500, colour = "Cl 2m")) +
+  geom_line(aes(date, y = cond_23.5/500, colour = "Cl 23.5m")) +
+  scale_y_continuous(sec.axis = sec_axis(~.*500, name = "EC [uS/cm]")) +
+  xlab('') +
+  ggtitle('Monona 2020-2021')+
+  theme_minimal();g3
+
+p = g1 + g2 + g3 +
+  plot_layout(guides = 'collect') +
+  plot_annotation(tag_levels = 'A', tag_suffix = ')')  & theme_minimal()& 
+  theme(legend.position = 'bottom', plot.tag = element_text(size = 8)) ; p
+ggsave('figs_HD/fieldmonitoring_ec.png', p,  dpi = 500, width = 250,height = 130, units = 'mm')
+
+
+
+
+
+
+
