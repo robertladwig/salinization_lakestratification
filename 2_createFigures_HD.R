@@ -402,5 +402,23 @@ p <- p1 / p2+ #ggarrange(p1[[1]] + theme_light(),
   plot_annotation(tag_levels = 'A', tag_suffix = ')')  & 
   theme(legend.position = 'bottom', plot.tag = element_text(size = 8)) & theme_minimal(); p
 ggsave('figs_HD/salt_ensemble.png', p,  dpi = 500, width = 250,height = 165, units = 'mm')
+                                                          
+                                                          
+# residence times
+inflow.mendota <- read.csv('numerical/mendota/1_calibration/LakeEnsemblR_inflow_standard.csv')
+mean.mendota <- mean(inflow.mendota$Flow_metersCubedPerSecond)
+
+hypso.mendota <- read.csv('numerical/mendota/1_calibration/LakeEnsemblR_bathymetry_standard.csv')
+volume.mendota <- pracma::trapz(hypso.mendota$Depth_meter, hypso.mendota$Area_meterSquared)
+
+print(paste0('residence time of Mendota is ', round(volume.mendota/mean.mendota/86400/365.25,2), ' years'))
+
+inflow.monona <- read.csv('numerical/monona/1_calibration/LakeEnsemblR_inflow_standard.csv')
+mean.monona <- mean(inflow.monona$Flow_metersCubedPerSecond)
+
+hypso.monona <- read.csv('numerical/monona/1_calibration/LakeEnsemblR_bathymetry_standard.csv')
+volume.monona <- pracma::trapz(hypso.monona$Depth_meter, hypso.monona$Area_meterSquared)
+
+print(paste0('residence time of Mendota is ', round(volume.monona/mean.monona/86400/365.25,2), ' years'))
 
 # ggsave('output/ensemble_ts2m.png', p,  dpi = 300,width = 384,height = 180, units = 'mm')
