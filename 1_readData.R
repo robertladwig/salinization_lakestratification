@@ -191,6 +191,49 @@ for (lake.id in lakes){
     )
     df_wtr$id = lake.id
     
+    df_salt <- data.frame('datetime' = salt_null$GLM$datetime,
+                          'salt_null' = apply(cbind(salt_null$GLM$wtr_20 - salt_null$GLM$wtr_2,
+                                                    salt_null$GOTM$wtr_20 - salt_null$GOTM$wtr_2,
+                                                    salt_null$Simstrat$wtr_20 - salt_null$Simstrat$wtr_2), 1, function(x) mean(x, na.rm = TRUE)),
+                          'salt_01' = apply(cbind(salt_01$GLM$wtr_20 - salt_01$GLM$wtr_2,
+                                                  salt_01$GOTM$wtr_20 - salt_01$GOTM$wtr_2,
+                                                  salt_01$Simstrat$wtr_20 - salt_01$Simstrat$wtr_2), 1, function(x) mean(x, na.rm = TRUE)),
+                          'salt_05' = apply(cbind(salt_05$GLM$wtr_20 - salt_05$GLM$wtr_2,
+                                                  salt_05$GOTM$wtr_20 - salt_05$GOTM$wtr_2,
+                                                  salt_05$Simstrat$wtr_20 - salt_05$Simstrat$wtr_2), 1, function(x) mean(x, na.rm = TRUE)),
+                          'salt_1' = apply(cbind(salt_1$GLM$wtr_20 - salt_1$GLM$wtr_2,
+                                                 salt_1$GOTM$wtr_20 - salt_1$GOTM$wtr_2,
+                                                 salt_1$Simstrat$wtr_20 - salt_1$Simstrat$wtr_2), 1, function(x) mean(x, na.rm = TRUE)),
+                          'salt_15' = apply(cbind(salt_15$GLM$wtr_20 - salt_15$GLM$wtr_2,
+                                                  salt_15$GOTM$wtr_20 - salt_15$GOTM$wtr_2,
+                                                  salt_15$Simstrat$wtr_20 - salt_15$Simstrat$wtr_2), 1, function(x) mean(x, na.rm = TRUE)),
+                          'salt_2' = apply(cbind(salt_2$GLM$wtr_20 - salt_2$GLM$wtr_2,
+                                                 salt_2$GOTM$wtr_20 - salt_2$GOTM$wtr_2,
+                                                 salt_2$Simstrat$wtr_20 - salt_2$Simstrat$wtr_2), 1, function(x) mean(x, na.rm = TRUE)),
+                          'salt_25' = apply(cbind(salt_25$GLM$wtr_20 - salt_25$GLM$wtr_2,
+                                                  salt_25$GOTM$wtr_20 - salt_25$GOTM$wtr_2,
+                                                  salt_25$Simstrat$wtr_20 - salt_25$Simstrat$wtr_2), 1, function(x) mean(x, na.rm = TRUE)),
+                          'salt_3' = apply(cbind(salt_3$GLM$wtr_20 - salt_3$GLM$wtr_2,
+                                                 salt_3$GOTM$wtr_20 - salt_3$GOTM$wtr_2,
+                                                 salt_3$Simstrat$wtr_20 - salt_3$Simstrat$wtr_2), 1, function(x) mean(x, na.rm = TRUE)),
+                          'salt_35' = apply(cbind(salt_35$GLM$wtr_20 - salt_35$GLM$wtr_2,
+                                                  salt_35$GOTM$wtr_20 - salt_35$GOTM$wtr_2,
+                                                  salt_35$Simstrat$wtr_20 - salt_35$Simstrat$wtr_2), 1, function(x) mean(x, na.rm = TRUE)),
+                          'salt_4' = apply(cbind(salt_4$GLM$wtr_20 - salt_4$GLM$wtr_2,
+                                                 salt_4$GOTM$wtr_20 - salt_4$GOTM$wtr_2,
+                                                 salt_4$Simstrat$wtr_20 - salt_4$Simstrat$wtr_2), 1, function(x) mean(x, na.rm = TRUE)),
+                          'salt_45' = apply(cbind(salt_45$GLM$wtr_20 - salt_45$GLM$wtr_2,
+                                                  salt_45$GOTM$wtr_20 - salt_45$GOTM$wtr_2,
+                                                  salt_45$Simstrat$wtr_20 - salt_45$Simstrat$wtr_2), 1, function(x) mean(x, na.rm = TRUE)),
+                          'salt_5' = apply(cbind(salt_5$GLM$wtr_20 - salt_5$GLM$wtr_2,
+                                                 salt_5$GOTM$wtr_20 - salt_5$GOTM$wtr_2,
+                                                 salt_5$Simstrat$wtr_20 - salt_5$Simstrat$wtr_2), 1, function(x) mean(x, na.rm = TRUE)),
+                          'salt_10' = apply(cbind(salt_10$GLM$wtr_20 - salt_10$GLM$wtr_2,
+                                                  salt_10$GOTM$wtr_20 - salt_10$GOTM$wtr_2,
+                                                  salt_10$Simstrat$wtr_20 - salt_10$Simstrat$wtr_2), 1, function(x) mean(x, na.rm = TRUE))
+    )
+    df_salt$id = lake.id
+    
     df_ice<- data.frame('datetime' = ice_null$GLM$time,
                         'ice_null' = apply(cbind(ice_null$GLM$ice_height,ice_null$GOTM$ice_height,ice_null$Simstrat$ice_height), 1, function(x) mean(x, na.rm = TRUE)),
                         'ice_01' = apply(cbind(ice_01$GLM$ice_height,ice_01$GOTM$ice_height,ice_01$Simstrat$ice_height), 1, function(x) mean(x, na.rm = TRUE)),
@@ -1051,6 +1094,49 @@ for (lake.id in lakes){
     )
     df_wtr2$id = lake.id
     
+    df_salt2 <- data.frame('datetime' = salt_null$GLM$datetime,
+                          'salt_null' = apply(cbind(salt_null$GLM$wtr_20 - salt_null$GLM$wtr_2,
+                                                    salt_null$GOTM$wtr_20 - salt_null$GOTM$wtr_2,
+                                                    salt_null$Simstrat$wtr_20 - salt_null$Simstrat$wtr_2), 1, function(x) mean(x, na.rm = TRUE)),
+                          'salt_01' = apply(cbind(salt_01$GLM$wtr_20 - salt_01$GLM$wtr_2,
+                                                  salt_01$GOTM$wtr_20 - salt_01$GOTM$wtr_2,
+                                                  salt_01$Simstrat$wtr_20 - salt_01$Simstrat$wtr_2), 1, function(x) mean(x, na.rm = TRUE)),
+                          'salt_05' = apply(cbind(salt_05$GLM$wtr_20 - salt_05$GLM$wtr_2,
+                                                  salt_05$GOTM$wtr_20 - salt_05$GOTM$wtr_2,
+                                                  salt_05$Simstrat$wtr_20 - salt_05$Simstrat$wtr_2), 1, function(x) mean(x, na.rm = TRUE)),
+                          'salt_1' = apply(cbind(salt_1$GLM$wtr_20 - salt_1$GLM$wtr_2,
+                                                 salt_1$GOTM$wtr_20 - salt_1$GOTM$wtr_2,
+                                                 salt_1$Simstrat$wtr_20 - salt_1$Simstrat$wtr_2), 1, function(x) mean(x, na.rm = TRUE)),
+                          'salt_15' = apply(cbind(salt_15$GLM$wtr_20 - salt_15$GLM$wtr_2,
+                                                  salt_15$GOTM$wtr_20 - salt_15$GOTM$wtr_2,
+                                                  salt_15$Simstrat$wtr_20 - salt_15$Simstrat$wtr_2), 1, function(x) mean(x, na.rm = TRUE)),
+                          'salt_2' = apply(cbind(salt_2$GLM$wtr_20 - salt_2$GLM$wtr_2,
+                                                 salt_2$GOTM$wtr_20 - salt_2$GOTM$wtr_2,
+                                                 salt_2$Simstrat$wtr_20 - salt_2$Simstrat$wtr_2), 1, function(x) mean(x, na.rm = TRUE)),
+                          'salt_25' = apply(cbind(salt_25$GLM$wtr_20 - salt_25$GLM$wtr_2,
+                                                  salt_25$GOTM$wtr_20 - salt_25$GOTM$wtr_2,
+                                                  salt_25$Simstrat$wtr_20 - salt_25$Simstrat$wtr_2), 1, function(x) mean(x, na.rm = TRUE)),
+                          'salt_3' = apply(cbind(salt_3$GLM$wtr_20 - salt_3$GLM$wtr_2,
+                                                 salt_3$GOTM$wtr_20 - salt_3$GOTM$wtr_2,
+                                                 salt_3$Simstrat$wtr_20 - salt_3$Simstrat$wtr_2), 1, function(x) mean(x, na.rm = TRUE)),
+                          'salt_35' = apply(cbind(salt_35$GLM$wtr_20 - salt_35$GLM$wtr_2,
+                                                  salt_35$GOTM$wtr_20 - salt_35$GOTM$wtr_2,
+                                                  salt_35$Simstrat$wtr_20 - salt_35$Simstrat$wtr_2), 1, function(x) mean(x, na.rm = TRUE)),
+                          'salt_4' = apply(cbind(salt_4$GLM$wtr_20 - salt_4$GLM$wtr_2,
+                                                 salt_4$GOTM$wtr_20 - salt_4$GOTM$wtr_2,
+                                                 salt_4$Simstrat$wtr_20 - salt_4$Simstrat$wtr_2), 1, function(x) mean(x, na.rm = TRUE)),
+                          'salt_45' = apply(cbind(salt_45$GLM$wtr_20 - salt_45$GLM$wtr_2,
+                                                  salt_45$GOTM$wtr_20 - salt_45$GOTM$wtr_2,
+                                                  salt_45$Simstrat$wtr_20 - salt_45$Simstrat$wtr_2), 1, function(x) mean(x, na.rm = TRUE)),
+                          'salt_5' = apply(cbind(salt_5$GLM$wtr_20 - salt_5$GLM$wtr_2,
+                                                 salt_5$GOTM$wtr_20 - salt_5$GOTM$wtr_2,
+                                                 salt_5$Simstrat$wtr_20 - salt_5$Simstrat$wtr_2), 1, function(x) mean(x, na.rm = TRUE)),
+                          'salt_10' = apply(cbind(salt_10$GLM$wtr_20 - salt_10$GLM$wtr_2,
+                                                  salt_10$GOTM$wtr_20 - salt_10$GOTM$wtr_2,
+                                                  salt_10$Simstrat$wtr_20 - salt_10$Simstrat$wtr_2), 1, function(x) mean(x, na.rm = TRUE))
+    )
+    df_salt2$id = lake.id
+    
     df_ice2<- data.frame('datetime' =  ice_null$GLM$time,
                          'ice_null' = apply(cbind(ice_null$GLM$ice_height,ice_null$GOTM$ice_height,ice_null$Simstrat$ice_height), 1, function(x) mean(x, na.rm = TRUE)),
                          'ice_01' = apply(cbind(ice_01$GLM$ice_height,ice_01$GOTM$ice_height,ice_01$Simstrat$ice_height), 1, function(x) mean(x, na.rm = TRUE)),
@@ -1284,6 +1370,7 @@ for (lake.id in lakes){
     
     df = rbind(df, df2)
     df_wtr = rbind(df_wtr, df_wtr2)
+    df_salt = rbind(df_salt, df_salt2)
     df_ssi = rbind(df_ssi, df_ssi2)
     df_ice <- rbind(df_ice, df_ice2)
     df_ln <- rbind(df_ln, df_ln2)
@@ -1851,6 +1938,7 @@ for (lake.id in lakes){
 
 write.csv(x = df, file = 'output/density.csv', quote = F, row.names = F)
 write.csv(x = df_wtr, file = 'output/wtemp.csv', quote = F, row.names = F)
+write.csv(x = df_salt, file = 'output/salt.csv', quote = F, row.names = F)
 write.csv(x = df_ssi, file = 'output/ssi.csv', quote = F, row.names = F)
 write.csv(x = df_ice, file = 'output/ice.csv', quote = F, row.names = F)
 write.csv(x = df_ln, file = 'output/lakenumber.csv', quote = F, row.names = F)

@@ -24,6 +24,7 @@ read.custom <- function(csv){
 
 df = read.custom('output/density.csv')
 df_wtr <- read.custom('output/wtemp.csv')
+df_salt <- read.custom('output/salt.csv')
 df_ssi <- read.custom('output/ssi.csv')
 df_ice <- read.custom('output/ice.csv')
 df_lakenumber <- read.custom('output/lakenumber.csv')
@@ -35,6 +36,7 @@ col_blues <- colorRampPalette(c("gray",'cyan', "darkblue", 'red1','red4'))
 m.df <- reshape2::melt(df, id = c('datetime', 'id'))
 m.df_ice <- reshape2::melt(df_ice, id = c('datetime', 'id'))
 m.df_wtr <- reshape2::melt(df_wtr, id = c('datetime', 'id'))
+m.df_salt <- reshape2::melt(df_salt, id = c('datetime', 'id'))
 m.df_ssi <- reshape2::melt(df_ssi, id = c('datetime', 'id'))
 m.df.lakenumber <- reshape2::melt(df_lakenumber, id = c('datetime', 'id'))
 
@@ -387,14 +389,14 @@ p <- p1[[1]] / p2[[1]] + #ggarrange(p1[[1]] + theme_light(),
   theme(legend.position = 'bottom', plot.tag = element_text(size = 8)) & theme_minimal(); p
 ggsave('figs_HD/temp_ensemble.png', p,  dpi = 500, width = 250,height = 165, units = 'mm')
 
-ncdf <- 'numerical/mendota/3_scenarios/3_constantsalt+2/output/ensemble_output.nc'
+ncdf <- 'numerical/mendota/3_scenarios/7_constantsalt+1/output/ensemble_output.nc'
 model = c('GLM', 'GOTM', 'Simstrat')
 p1 <- plot_ensemble(ncdf, model = model,
                     var = "salt", depth = 2,
-                    residuals = TRUE) 
+                    residuals = TRUE) + xlim(as.POSIXct('2010-01-01'), as.POSIXct('2015-12-31'))
 p2 <- plot_ensemble(ncdf, model = model,
                     var = "salt", depth = 22,
-                    residuals = TRUE)
+                    residuals = TRUE) + xlim(as.POSIXct('2010-01-01'), as.POSIXct('2015-12-31'))
 # Arrange the two plots above each other
 p <- p1 / p2+ #ggarrange(p1[[1]] + theme_light(),
   #p2[[1]] + theme_light(), ncol = 1, nrow = 2) +
@@ -438,15 +440,15 @@ df_me <- merge(me_epi_1920, me_hyp_1920, by = 'date') %>%
   mutate('tempgrad' = Temp.y - Temp.x,
          'cond_2' = runningmean.x,
          'cond_23.5' = runningmean.y,
-         'cl_2' = runningmean.x * 0.027856 + 35.386954,
-         'cl_23.5' = runningmean.x * 0.002530 + 49.023895) %>%
+         'cl_2' = runningmean.x * 0.55/1000,
+         'cl_23.5' = runningmean.y * 0.55/1000) %>%
   select(date, tempgrad, cond_2, cond_23.5, cl_2, cl_23.5)
 g1 <- ggplot(df_me) +
   geom_line( aes(date, abs(tempgrad), col = 'Delta T')) +
   ylab('Wtemp density [deg C/m]') +
-  geom_line(aes(date, y = cl_2/1000*20, colour = "Cl 2m")) +
-  geom_line(aes(date, y = cl_23.5/1000*20, colour = "Cl 23.5m")) +
-  scale_y_continuous(sec.axis = sec_axis(~./20, name = "PSU [g/kg]")) +
+  geom_line(aes(date, y = cl_2*3, colour = "PSU 2m")) +
+  geom_line(aes(date, y = cl_23.5*3, colour = "PSU 23.5m")) +
+  scale_y_continuous(sec.axis = sec_axis(~./3, name = "PSU [g/kg]")) +
   xlab('') +
   ggtitle('Mendota 2019-2020')+
   theme_minimal();g1
@@ -455,15 +457,15 @@ df_mo19 <- merge(mo_epi_1920, mo_hyp_1920, by = 'date') %>%
   mutate('tempgrad' = Temp.y - Temp.x,
          'cond_2' = runningmean.x,
          'cond_23.5' = runningmean.y,
-         'cl_2' = runningmean.x * -0.003770 + 68.159981,
-         'cl_23.5' = runningmean.x * 0.15281  - 8.75396) %>%
+         'cl_2' = runningmean.x * 0.55/1000,
+         'cl_23.5' = runningmean.y * 0.55/1000) %>%
   select(date, tempgrad, cond_2, cond_23.5, cl_2, cl_23.5)
 g2 <- ggplot(df_mo19) +
   geom_line( aes(date, abs(tempgrad), col = 'Delta T')) +
   ylab('Wtemp density [deg C/m]') +
-  geom_line(aes(date, y = cl_2/1000*20, colour = "Cl 2m")) +
-  geom_line(aes(date, y = cl_23.5/1000*20, colour = "Cl 23.5m")) +
-  scale_y_continuous(sec.axis = sec_axis(~./20, name = "PSU [g/kg]")) +
+  geom_line(aes(date, y = cl_2*3, colour = "PSU 2m")) +
+  geom_line(aes(date, y = cl_23.5*3, colour = "PSU 23.5m")) +
+  scale_y_continuous(sec.axis = sec_axis(~./3, name = "PSU [g/kg]")) +
   xlab('') +
   ggtitle('Monona 2019-2020')+
   theme_minimal();g2
@@ -472,15 +474,15 @@ df_mo20 <- merge(mo_epi_2021, mo_hyp_2021, by = 'date') %>%
   mutate('tempgrad' = Temp.y - Temp.x,
          'cond_2' = runningmean.x,
          'cond_23.5' = runningmean.y,
-         'cl_2' = runningmean.x * -0.003770 + 68.159981,
-         'cl_23.5' = runningmean.x * 0.15281  - 8.75396) %>%
+         'cl_2' = runningmean.x * 0.55/1000,
+         'cl_23.5' = runningmean.y * 0.55/1000) %>%
   select(date, tempgrad, cond_2, cond_23.5, cl_2, cl_23.5)
 g3 <- ggplot(df_mo20) +
   geom_line( aes(date, abs(tempgrad), col = 'Delta T')) +
   ylab('Wtemp density [deg C/m]') +
-  geom_line(aes(date, y = cl_2/1000*20, colour = "Cl 2m")) +
-  geom_line(aes(date, y = cl_23.5/1000*20, colour = "Cl 23.5m")) +
-  scale_y_continuous(sec.axis = sec_axis(~./20, name = "PSU [g/kg]")) +
+  geom_line(aes(date, y = cl_2*3, colour = "PSU 2m")) +
+  geom_line(aes(date, y = cl_23.5*3, colour = "PSU 23.5m")) +
+  scale_y_continuous(sec.axis = sec_axis(~./3, name = "PSU [g/kg]")) +
   xlab('') +
   ggtitle('Monona 2020-2021')+
   theme_minimal();g3
@@ -490,6 +492,7 @@ p = g1 + g2 + g3 +
   plot_annotation(tag_levels = 'A', tag_suffix = ')')  & theme_minimal()& 
   theme(legend.position = 'bottom', plot.tag = element_text(size = 8)) ; p
 ggsave('figs_HD/fieldmonitoring_psu.png', p,  dpi = 500, width = 250,height = 130, units = 'mm')
+
 
 
 g1 <- ggplot(df_me) +
@@ -528,6 +531,55 @@ p = g1 + g2 + g3 +
   theme(legend.position = 'bottom', plot.tag = element_text(size = 8)) ; p
 ggsave('figs_HD/fieldmonitoring_ec.png', p,  dpi = 500, width = 250,height = 130, units = 'mm')
 
+
+
+g1 <- ggplot(df_me) +
+  geom_line( aes(date, abs(tempgrad), col = 'Delta T')) +
+  ylab('Wtemp density [deg C/m]') +
+  geom_line(aes(date, y = cl_23.5*3 - cl_2*3, colour = "Delta PSU")) +
+  scale_y_continuous(sec.axis = sec_axis(~./3, name = "PSU [g/kg]")) +
+  xlab('') +
+  ggtitle('Mendota 2019-2020')+
+  theme_minimal();g1
+
+g2 <- ggplot(df_mo19) +
+  geom_line( aes(date, abs(tempgrad), col = 'Delta T')) +
+  ylab('Wtemp density [deg C/m]') +
+  geom_line(aes(date, y = cl_23.5*3 - cl_2*3, colour = "Delta PSU")) +
+  scale_y_continuous(sec.axis = sec_axis(~./3, name = "PSU [g/kg]")) +
+  xlab('') +
+  ggtitle('Monona 2019-2020')+
+  theme_minimal();g2
+
+g3 <- ggplot(df_mo20) +
+  geom_line( aes(date, abs(tempgrad), col = 'Delta T')) +
+  ylab('Wtemp density [deg C/m]') +
+  geom_line(aes(date, y = cl_23.5*3 - cl_2*3, colour = "Delta PSU")) +
+  scale_y_continuous(sec.axis = sec_axis(~./3, name = "PSU [g/kg]")) +
+  xlab('') +
+  ggtitle('Monona 2020-2021')+
+  theme_minimal();g3
+
+g4 <- ggplot(subset(m.df_salt, variable == '1')) +
+  geom_line(aes(datetime, (value), color = 'PSU difference'), size = 0.2) +
+  ylab(bquote(PSU~Difference ~ (g~kg^-1))) +
+  ylim(0,0.6)+
+  geom_line(data = subset(m.df_wtr, variable == '1'), aes(datetime, y = abs(value)/50,
+                                                          col = 'Temp. difference'), size = 0.2) +
+  scale_y_continuous(sec.axis = sec_axis(~.*60, name = "Temp. Differenc [K]")) +
+  facet_wrap(~ id, ncol=1)+
+  # scale_color_manual(values = col_blues(13), name = bquote(Salt~Scenario ~ (g~kg^-1))) +
+  theme_custom + 
+  scale_colour_manual(values = c("blue", "red")) +
+  theme(legend.position = c(0.8, 0.95)) +
+  labs(color = "Variable") +
+  guides(color=guide_legend(nrow=2,byrow=TRUE)); g4
+
+p = g4 | (g1 / g2 / g3 ) +
+  plot_layout(guides = 'collect') +
+  plot_annotation(tag_levels = 'A', tag_suffix = ')')  & theme_minimal()& 
+  theme(legend.position = 'bottom', plot.tag = element_text(size = 8)) ; p
+ggsave('figs_HD/fieldmonitoring_model.png', p,  dpi = 500, width = 250,height = 130, units = 'mm')
 
 
 
