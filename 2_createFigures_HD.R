@@ -198,7 +198,7 @@ g_mixing <- ggplot(m.df.mixedDated, aes(year, as.Date(value, origin = as.Date('2
 ggsave('figs_HD/firstMixingdays.png', g_mixing, dpi = 500, width = 165,height = 90, units = 'mm')
 
 g_mixing_hd <- ggplot(m.df.mixedDated, aes(variable,  as.Date(value, origin = as.Date('2019-01-01')), fill = variable)) +
-  geom_line(aes(variable,  as.Date(value, origin = as.Date('2019-01-01')), group = year, col = variable), size = 0.2, , show.legend = FALSE) +
+  geom_line(aes(variable,  as.Date(value, origin = as.Date('2019-01-01')), group = year, col = variable), size = 0.2, show.legend = FALSE) +
   geom_point(size = 1.2, shape = 21, stroke = 0.1, alpha = 0.8, show.legend = FALSE) + 
   ylab('First mixing day of the year') + 
   scale_y_date(labels = date_format("%b"), breaks = 'month') +
@@ -255,7 +255,7 @@ g_summerstrat <- ggplot(m.df.stratdur, aes(year, value, col = variable)) +
 ggsave('figs_HD/Summerstratdur.png', g_summerstrat,  dpi = 500, width = 165, height = 90, units = 'mm')
 
 g_summerstrat <- ggplot(m.df.stratdur, aes(variable, value, fill = variable)) +
-  geom_line(aes(variable, value, group = year, col = variable), size = 0.2, , show.legend = FALSE) +
+  geom_line(aes(variable, value, group = year, col = variable), size = 0.2, show.legend = FALSE) +
   geom_point(size = 1.2, shape = 21, stroke = 0.1, alpha = 0.8, show.legend = FALSE) + 
   ylab('Summer stratification duration') + 
   xlab(bquote(Salt~Scenario ~ (g~kg^-1))) +
@@ -268,7 +268,7 @@ ggsave('figs_HD/Summerstratdur_salt.png', g_summerstrat,  dpi = 500, width = 165
 
 
 g_summerstrat_scaled <- ggplot(m.df.stratdur_scaled, aes(variable, value, fill = variable)) +
-  geom_line(aes(variable, value, group = year, col = variable), size = 0.2, , show.legend = FALSE) +
+  geom_line(aes(variable, value, group = year, col = variable), size = 0.2, show.legend = FALSE) +
   geom_point(size = 1.2, shape = 21, stroke = 0.1, alpha = 0.8, show.legend = FALSE) + 
   ylab('Summer stratification duration normalized on null (days)') + 
   ylab(expression(atop("Summer stratification duration", paste("normalized on null (days)")))) +
@@ -325,7 +325,7 @@ ggsave('figs_HD/Lakenumber.png', g_lakenumber,  dpi = 500, width = 165, height =
 
 g_lakenumber <- ggplot(subset(m.df_lakenumber_scaled, month >=3 & month < 6 ),#& day %in% c(1,15,30)),
                        aes(variable, value, fill = variable)) +
-  geom_line(aes(variable, value, group = datetime, col = variable), size = 0.2, , show.legend = FALSE) +
+  geom_line(aes(variable, value, group = datetime, col = variable), size = 0.2, show.legend = FALSE) +
   geom_point(size = 1.2, shape = 21, stroke = 0.1, alpha = 0.8, show.legend = FALSE) + 
   # ylab('Spring Lake Number normalized on null') + 
   ylab(expression(atop("Lake Number (March-May)", paste("normalized on null (-)")))) +
@@ -407,7 +407,7 @@ ggsave('figs_HD/salt_ensemble.png', p,  dpi = 500, width = 250,height = 165, uni
                                                           
                                                           
 # residence times
-inflow.mendota <- read.csv('numerical/mendota/1_calibration/LakeEnsemblR_inflow_standard.csv')
+inflow.mendota <- read_csv('numerical/mendota/1_calibration/LakeEnsemblR_inflow_standard.csv')
 mean.mendota <- mean(inflow.mendota$Flow_metersCubedPerSecond)
 
 hypso.mendota <- read.csv('numerical/mendota/1_calibration/LakeEnsemblR_bathymetry_standard.csv')
@@ -438,11 +438,122 @@ mo_hyp_2021 <- readRDS(file = 'fieldmonitoring/MO_HYPO_2020-21.rds')
 
 df_me <- merge(me_epi_1920, me_hyp_1920, by = 'date') %>%
   mutate('tempgrad' = Temp.y - Temp.x,
+         'temp_2' = Temp.x,
+         'temp_23.5' = Temp.y,
          'cond_2' = runningmean.x,
          'cond_23.5' = runningmean.y,
          'cl_2' = runningmean.x * 0.55/1000,
          'cl_23.5' = runningmean.y * 0.55/1000) %>%
-  select(date, tempgrad, cond_2, cond_23.5, cl_2, cl_23.5)
+  select(date, tempgrad, temp_2, temp_23.5, cond_2, cond_23.5, cl_2, cl_23.5)
+
+df_mo19 <- merge(mo_epi_1920, mo_hyp_1920, by = 'date') %>%
+  mutate('tempgrad' = Temp.y - Temp.x,
+         'temp_2' = Temp.x,
+         'temp_23.5' = Temp.y,
+         'cond_2' = runningmean.x,
+         'cond_23.5' = runningmean.y,
+         'cl_2' = runningmean.x * 0.55/1000,
+         'cl_23.5' = runningmean.y * 0.55/1000) %>%
+  select(date, tempgrad, temp_2, temp_23.5, cond_2, cond_23.5, cl_2, cl_23.5)
+
+df_mo20 <- merge(mo_epi_2021, mo_hyp_2021, by = 'date') %>%
+  mutate('tempgrad' = Temp.y - Temp.x,
+         'temp_2' = Temp.x,
+         'temp_23.5' = Temp.y,
+         'cond_2' = runningmean.x,
+         'cond_23.5' = runningmean.y,
+         'cl_2' = runningmean.x * 0.55/1000,
+         'cl_23.5' = runningmean.y * 0.55/1000) %>%
+  select(date, tempgrad, temp_2, temp_23.5, cond_2, cond_23.5, cl_2, cl_23.5)
+
+
+# https://www.aos.wisc.edu/~sco/lakes/msnicesum.html
+plotEC <- function(df, usetitle, icedate, icedate2){
+  df2 = df %>% 
+    mutate(EC.diff = (cond_23.5 - cond_2)/80) %>% 
+    select(date, temp_2, temp_23.5, EC.diff) %>% 
+    pivot_longer(cols = temp_2:EC.diff, names_to = 'var')
+  ggplot(df2) +
+    geom_line(aes(x = date, y = value, group = var, col = var)) +
+    scale_color_manual(values = c('red4','lightblue2','lightblue4')) +
+    geom_vline(xintercept = as.POSIXct(icedate), linetype = 'dashed', size = 0.2) +
+    geom_vline(xintercept = as.POSIXct(icedate2), linetype = 'dashed', size = 0.2) +
+    ylab('Temp (°C)') +
+    labs(title = usetitle) +
+    scale_y_continuous(sec.axis = sec_axis(~.*80, name = bquote('\u0394'~EC ~ (µS~cm^-1)))) +
+    theme_custom +
+    theme(legend.title = element_blank(),
+          plot.title = element_text(size = 8),
+          axis.title.x = element_blank(),
+          axis.title.y.right = element_text(color = 'red4'),
+          axis.title.y.left = element_text(color = 'lightblue4')) 
+}
+g1 = plotEC(df_me, usetitle = 'Mendota 2019-2020', icedate = '2020-03-22', icedate2 = '2020-01-12') +
+  theme(legend.position = c(0.18, 0.75)); g1
+g2 = plotEC(df_mo19, usetitle = 'Monona 2019-2020', icedate = '2020-03-20', icedate2 = '2020-01-12') +
+  theme(legend.position = 'none')
+g3 = plotEC(df_mo20, usetitle = 'Monona 2020-2021', icedate = '2021-03-22', icedate2 = '2020-12-29') +
+  theme(legend.position = 'none')
+
+g1 / g2 / g3
+ggsave('figs_HD/fieldmonitoring_model2.png', dpi = 500, width = 3.25,height = 4, units = 'in')
+
+g4 <- ggplot(m.df_wtr %>% filter(id == 'Lake Mendota' & variable == 2)) +
+  geom_hline(yintercept = 1, linetype = 'dashed', size = 0.2) +
+  geom_line(aes(datetime, (value), color = '\u0394 Temp'), size = 0.4) +
+  ylab('\u0394 Temp [°C]') +
+  # ylim(0,15) +
+  xlab('2014-2015') +
+  labs(title = 'Lake Mendota Simulation') +
+  geom_line(data = m.df_salt %>% filter(id == 'Lake Mendota' & variable == 2), 
+            aes(datetime, y = (value)*10, col = '\u0394 Salinity/EC'), size = 0.4) +
+  scale_y_continuous(sec.axis = sec_axis(~./10, name = bquote('\u0394'~Salinity ~ (g~kg^-1)))) +
+  scale_x_date(labels = date_format("%b"), breaks = '2 months', limits = c(as.Date('2014-01-01'), as.Date('2014-05-31'))) +
+  scale_colour_manual(values = c("red4", "lightblue4")) +
+  theme_custom + 
+  theme(legend.position = c(0.8, 0.95),
+        legend.title = element_blank(), 
+        axis.title.y.right = element_text(color = 'red4'),
+        axis.title.y.left = element_text(color = 'lightblue4')) +
+  guides(color=guide_legend(nrow=1,byrow=TRUE)); g4
+
+
+g5 <- ggplot(m.df_wtr %>% filter(id == 'Lake Monona' & variable == 2)) +
+  geom_hline(yintercept = 1, linetype = 'dashed', size = 0.2) +
+  geom_line(aes(datetime, (value), color = '\u0394 Temp'), size = 0.4) +
+  ylab('\u0394 Temp [°C]') +
+  # ylim(0,15) +
+  xlab('2014-2015') +
+  labs(title = 'Lake Monona Simulation') +
+  geom_line(data = m.df_salt %>% filter(id == 'Lake Monona' & variable == 2), 
+            aes(datetime, y = (value)*10, col = '\u0394 Salinity/EC'), size = 0.4) +
+  scale_y_continuous(sec.axis = sec_axis(~./10, name = bquote('\u0394'~Salinity ~ (g~kg^-1)))) +
+  scale_x_date(labels = date_format("%b"), breaks = '2 months', limits = c(as.Date('2014-01-01'), as.Date('2014-05-31'))) +
+  scale_colour_manual(values = c("red4", "lightblue4")) +
+  theme_custom + 
+  theme(legend.position = c(0.8, 0.95),
+        legend.title = element_blank(), 
+        axis.title.y.right = element_text(color = 'red4'),
+        axis.title.y.left = element_text(color = 'lightblue4')) +
+  guides(color=guide_legend(nrow=1,byrow=TRUE)); g5
+
+# layout <- "
+# AACC
+# AACC
+# AACC
+# ##DD
+# BBDD
+# BBEE
+# FFEE
+# "
+# 
+# p = g4 + g5 + g1 + g2 + g3 + guide_area() +
+#   plot_layout(design = layout, guides = 'collect') +
+#   plot_annotation(tag_levels = 'A', tag_suffix = ')')  &  
+#   theme(legend.position = 'bottom', plot.tag = element_text(size = 8)) ; p
+# ggsave('figs_HD/fieldmonitoring_model.png', p,  dpi = 500, width = 6.5,height = 4, units = 'in')
+# 
+
 g1 <- ggplot(df_me) +
   geom_line( aes(date, abs(tempgrad), col = 'Delta T')) +
   ylab('Wtemp density [deg C/m]') +
@@ -453,13 +564,6 @@ g1 <- ggplot(df_me) +
   ggtitle('Mendota 2019-2020')+
   theme_minimal();g1
 
-df_mo19 <- merge(mo_epi_1920, mo_hyp_1920, by = 'date') %>%
-  mutate('tempgrad' = Temp.y - Temp.x,
-         'cond_2' = runningmean.x,
-         'cond_23.5' = runningmean.y,
-         'cl_2' = runningmean.x * 0.55/1000,
-         'cl_23.5' = runningmean.y * 0.55/1000) %>%
-  select(date, tempgrad, cond_2, cond_23.5, cl_2, cl_23.5)
 g2 <- ggplot(df_mo19) +
   geom_line( aes(date, abs(tempgrad), col = 'Delta T')) +
   ylab('Wtemp density [deg C/m]') +
@@ -470,13 +574,6 @@ g2 <- ggplot(df_mo19) +
   ggtitle('Monona 2019-2020')+
   theme_minimal();g2
 
-df_mo20 <- merge(mo_epi_2021, mo_hyp_2021, by = 'date') %>%
-  mutate('tempgrad' = Temp.y - Temp.x,
-         'cond_2' = runningmean.x,
-         'cond_23.5' = runningmean.y,
-         'cl_2' = runningmean.x * 0.55/1000,
-         'cl_23.5' = runningmean.y * 0.55/1000) %>%
-  select(date, tempgrad, cond_2, cond_23.5, cl_2, cl_23.5)
 g3 <- ggplot(df_mo20) +
   geom_line( aes(date, abs(tempgrad), col = 'Delta T')) +
   ylab('Wtemp density [deg C/m]') +
@@ -575,7 +672,7 @@ g4 <- ggplot(subset(m.df_wtr, variable == '2')) +
   ylim(0,15)+
   xlim(as.Date('2014-01-01'), as.Date('2015-12-31')) +
   geom_line(data = subset(m.df_salt, variable == '2'), aes(datetime, y = (value)*10,
-                                                          col = '\u0394S'), size = 1) +
+                                                           col = '\u0394S'), size = 1) +
   scale_y_continuous(sec.axis = sec_axis(~./10, name = "\u0394Salt [g/kg]")) +
   facet_wrap(~ id, ncol=1)+
   # scale_color_manual(values = col_blues(13), name = bquote(Salt~Scenario ~ (g~kg^-1))) +
@@ -590,9 +687,3 @@ p = g4 + (g1  / g2 / g3 ) +
   plot_annotation(tag_levels = 'A', tag_suffix = ')')  & theme_minimal()& 
   theme(legend.position = 'bottom', plot.tag = element_text(size = 8)) ; p
 ggsave('figs_HD/fieldmonitoring_model.png', p,  dpi = 500, width = 250,height = 250, units = 'mm')
-
-
-
-
-
-
