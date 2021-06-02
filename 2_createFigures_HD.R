@@ -532,56 +532,64 @@ p = g1 + g2 + g3 +
 ggsave('figs_HD/fieldmonitoring_ec.png', p,  dpi = 500, width = 250,height = 130, units = 'mm')
 
 
-
-g1 <- ggplot(df_me) +
-  geom_line( aes(date, abs(tempgrad), col = 'Delta T')) +
-  ylab('Wtemp density [deg C/m]') +
-  geom_line(aes(date, y = cl_23.5*3 - cl_2*3, colour = "Delta PSU")) +
-  scale_y_continuous(sec.axis = sec_axis(~./3, name = "PSU [g/kg]")) +
+# https://www.aos.wisc.edu/~sco/lakes/msnicesum.html
+g1 <- ggplot(df_me%>% mutate('title' = 'Mendota 2019-2020')) +
+  geom_line( aes(date, abs(tempgrad), col = '\u0394T')) +
+  geom_hline(yintercept = 1, linetype = 'dashed', size = 0.2) +
+  geom_vline(xintercept = as.POSIXct('2020-03-22'), linetype = 'dashed', size = 0.2) +
+  ylab('\u0394Temp. [K]') +
+  geom_line(aes(date, y = cl_23.5*3 - cl_2*3, colour = "\u0394S")) +
+  scale_y_continuous(sec.axis = sec_axis(~./3, name = "\u0394Salt [g/kg]")) +
   xlab('') +
-  ggtitle('Mendota 2019-2020')+
-  theme_minimal();g1
+  facet_grid(. ~ title) +
+  theme_custom;g1
 
-g2 <- ggplot(df_mo19) +
-  geom_line( aes(date, abs(tempgrad), col = 'Delta T')) +
-  ylab('Wtemp density [deg C/m]') +
-  geom_line(aes(date, y = cl_23.5*3 - cl_2*3, colour = "Delta PSU")) +
-  scale_y_continuous(sec.axis = sec_axis(~./3, name = "PSU [g/kg]")) +
+g2 <- ggplot(df_mo19%>% mutate('title' = 'Monona 2010-2020')) +
+  geom_line( aes(date, abs(tempgrad), col = '\u0394T')) +
+  geom_hline(yintercept = 1, linetype = 'dashed', size = 0.2) +
+  geom_vline(xintercept = as.POSIXct('2020-03-20'), linetype = 'dashed', size = 0.2) +
+  ylab('\u0394Temp. [K]') +
+  geom_line(aes(date, y = cl_23.5*3 - cl_2*3, colour = "\u0394S")) +
+  scale_y_continuous(sec.axis = sec_axis(~./3, name = "\u0394Salt [g/kg]")) +
   xlab('') +
-  ggtitle('Monona 2019-2020')+
-  theme_minimal();g2
+  facet_grid(. ~ title) +
+  theme_custom;g2
 
-g3 <- ggplot(df_mo20) +
-  geom_line( aes(date, abs(tempgrad), col = 'Delta T')) +
-  ylab('Wtemp density [deg C/m]') +
-  geom_line(aes(date, y = cl_23.5*3 - cl_2*3, colour = "Delta PSU")) +
-  scale_y_continuous(sec.axis = sec_axis(~./3, name = "PSU [g/kg]")) +
+g3 <- ggplot(df_mo20 %>% mutate('title' = 'Monona 2020-2021')) +
+  geom_line( aes(date, abs(tempgrad), col = '\u0394T')) +
+  geom_hline(yintercept = 1, linetype = 'dashed', size = 0.2) +
+  geom_vline(xintercept = as.POSIXct('2021-03-22'), linetype = 'dashed', size = 0.2) +
+  ylab('\u0394Temp. [K]') +
+  geom_line(aes(date, y = cl_23.5*3 - cl_2*3, colour = "\u0394S")) +
+  scale_y_continuous(sec.axis = sec_axis(~./3, name = "\u0394Salt [g/kg]")) +
   xlab('') +
-  ggtitle('Monona 2020-2021')+
-  theme_minimal();g3
+  facet_grid(. ~ title) +
+  theme_custom;g3
 
-g4 <- ggplot(subset(m.df_salt, variable == '1')) +
-  geom_line(aes(datetime, (value), color = 'PSU difference'), size = 0.2) +
-  ylab(bquote(PSU~Difference ~ (g~kg^-1))) +
-  ylim(0,0.6)+
+g4 <- ggplot(subset(m.df_wtr, variable == '2')) +
+  geom_line(aes(datetime, abs(value), color = '\u0394T'), size = 1) +
+  # geom_line(aes(datetime, (value), color = '\u0394S'), size = 1) +
+  ylab('\u0394Temp. [K]') +
+  geom_hline(yintercept = 1, linetype = 'dashed', size = 0.2) +
+  # ylab(bquote(Salt ~ (g~kg^-1))) +
+  ylim(0,15)+
   xlim(as.Date('2014-01-01'), as.Date('2015-12-31')) +
-  geom_line(data = subset(m.df_wtr, variable == '1'), aes(datetime, y = abs(value)/30,
-                                                          col = 'Temp. difference'), size = 0.2) +
-  geom_hline(yintercept = 1/30, linetype = 'dashed', size = 0.2) +
-  scale_y_continuous(sec.axis = sec_axis(~.*30, name = "Temp. Differenc [K]")) +
+  geom_line(data = subset(m.df_salt, variable == '2'), aes(datetime, y = (value)*10,
+                                                          col = '\u0394S'), size = 1) +
+  scale_y_continuous(sec.axis = sec_axis(~./10, name = "\u0394Salt [g/kg]")) +
   facet_wrap(~ id, ncol=1)+
   # scale_color_manual(values = col_blues(13), name = bquote(Salt~Scenario ~ (g~kg^-1))) +
   theme_custom + 
   scale_colour_manual(values = c("blue", "red")) +
   theme(legend.position = c(0.8, 0.95)) +
-  labs(color = "Variable") +
-  guides(color=guide_legend(nrow=2,byrow=TRUE)); g4
+  labs(color = "") +
+  guides(color=guide_legend(nrow=1,byrow=TRUE)); g4
 
-p = g4 | (g1 / g2 / g3 ) +
+p = g4 + (g1  / g2 / g3 ) +
   plot_layout(guides = 'collect') +
   plot_annotation(tag_levels = 'A', tag_suffix = ')')  & theme_minimal()& 
   theme(legend.position = 'bottom', plot.tag = element_text(size = 8)) ; p
-ggsave('figs_HD/fieldmonitoring_model.png', p,  dpi = 500, width = 250,height = 130, units = 'mm')
+ggsave('figs_HD/fieldmonitoring_model.png', p,  dpi = 500, width = 250,height = 250, units = 'mm')
 
 
 
