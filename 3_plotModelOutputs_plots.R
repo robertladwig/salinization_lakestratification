@@ -2,7 +2,7 @@ source('3_plotModel_functions.R')
 startyear = 2013 #Choose start year. Set up to plot two years
 
 # Read in ice data
-ice = read_csv('LTERdata/ntl_icedatescombo.csv')
+ice = read_csv('data/ntl_icedatescombo.csv')
 # Mendota temperature observations
 me.obs = plot_var_df(read.output('output_modelruns/NULL/Mendota_Obs_temp.csv', startyear), var_name = 'Temp', interpolate = T, zlim = c(0,32),) +
   # add ice rect. 
@@ -191,5 +191,42 @@ me.t.Simstrat.NULL + mo.t.Simstrat.NULL +
   me.s.Simstrat.1.5 + mo.s.Simstrat.1.5 +
   plot_layout(design = layout, guides = 'collect')
 ggsave(paste0('figs_HD/plotModelOutputs_',startyear,'_Simstrat.png'), width = 6.5, height = 5, units = 'in', dpi = 500)
+
+
+
+#### Ice off plots ####
+me.iceoff = getIceOff('output_modelruns/1.5/Mendota_GLM_ice.csv') %>% mutate(model = 'GLM') %>% 
+  bind_rows(
+    getIceOff('output_modelruns/1.5/Mendota_GOTM_ice.csv') %>% mutate(model = 'GOTM')
+  ) %>% bind_rows(
+    getIceOff('output_modelruns/1.5/Mendota_Simstrat_ice.csv') %>% mutate(model = 'Simstrat')
+  )
+
+i1 = ice %>% filter(lakeid == 'ME' & year >= 1995 & year(lastice) <= 2015) %>% select(lastice) %>% 
+  mutate(year = year(lastice)) %>% left_join(me.iceoff) %>% 
+  ggplot() +
+  geom_point(aes(x = yday(lastice), y = yday(iceoff), group = model)) +
+  geom_abline() +
+  ylab('Modeled ice-off') + xlab('Observed ice-off') +
+  facet_wrap(~model) +
+  labs(title = 'Lake Mendota')
+
+mo.iceoff = getIceOff('output_modelruns/1.5/Monona_GLM_ice.csv') %>% mutate(model = 'GLM') %>% 
+  bind_rows(
+    getIceOff('output_modelruns/1.5/Monona_GOTM_ice.csv') %>% mutate(model = 'GOTM')
+  ) %>% bind_rows(
+    getIceOff('output_modelruns/1.5/Monona_Simstrat_ice.csv') %>% mutate(model = 'Simstrat')
+  )
+
+i2 = ice %>% filter(lakeid == 'MO' & year >= 1995 & year(lastice) <= 2015) %>% select(lastice) %>% 
+  mutate(year = year(lastice)) %>% left_join(me.iceoff) %>% 
+  ggplot() +
+  geom_point(aes(x = yday(lastice), y = yday(iceoff), group = model)) +
+  geom_abline() +
+  ylab('Modeled ice-off') + xlab('Observed ice-off') +
+  facet_wrap(~model) +
+  labs(title = 'Lake Monona')
+
+i1/i2
 
 

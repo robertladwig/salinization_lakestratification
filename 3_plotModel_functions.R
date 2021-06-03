@@ -5,7 +5,7 @@ library(patchwork)
 # Load model output 
 read.output <- function(csv, startyear){
   read_csv(csv) %>% 
-    rename(DateTime = datetime) %>% 
+    dplyr::rename(DateTime = datetime) %>% 
     filter(DateTime >= as.Date(paste0(startyear,'-01-01'))) %>% 
     filter(DateTime < as.Date(paste0(startyear+2,'-01-01'))) 
 }
@@ -13,14 +13,14 @@ read.output <- function(csv, startyear){
 getMixedDate.ME <- function(csvIce, csvDens, startyear){
   # Last ice day
   ice = read_csv(csvIce) %>% 
-    rename(DateTime = datetime) %>% 
+    dplyr::rename(DateTime = datetime) %>% 
     filter(month(DateTime) <= 5 & year(DateTime) == startyear) %>% 
     filter(ice_height > 0) %>% 
     slice(n()) %>% 
     pull(DateTime)
   
   read_csv(csvDens) %>% 
-    rename(DateTime = datetime) %>% 
+    dplyr::rename(DateTime = datetime) %>% 
     # pivot_longer(cols = -c(DateTime), names_to = 'depth', values_to = 'density') %>% 
     select(DateTime, dens_1, dens_24) %>% 
     filter(DateTime > ice) %>% # after ice comes off
@@ -29,10 +29,11 @@ getMixedDate.ME <- function(csvIce, csvDens, startyear){
     slice(1) %>% 
     pull(DateTime)
 }
+
 getMixedDate.MO <- function(csvIce, csvDens, startyear){
   # Last ice day
   ice = read_csv(csvIce) %>% 
-    rename(DateTime = datetime) %>% 
+    dplyr::rename(DateTime = datetime) %>% 
     filter(month(DateTime) <= 5 & year(DateTime) == startyear) %>% 
     filter(ice_height > 0) %>% 
     slice(n()) %>% 
@@ -40,7 +41,7 @@ getMixedDate.MO <- function(csvIce, csvDens, startyear){
   
   # First mixed date
   read_csv(csvDens) %>% 
-    rename(DateTime = datetime) %>% 
+    dplyr::rename(DateTime = datetime) %>% 
     select(DateTime, dens_1, dens_20) %>% 
     filter(DateTime > ice) %>% # after ice comes off
     mutate(densDiff = dens_20 - dens_1) %>% 
@@ -51,6 +52,18 @@ getMixedDate.MO <- function(csvIce, csvDens, startyear){
 # getMixedDate.ME('output_modelruns/1.5/Mendota_GLM_ice.csv', 
 #              'output_modelruns/1.5/Mendota_GLM_dens.csv', 
 #              2000)
+
+
+getIceOff <- function(csvIce, csvDens, startyear){
+  # Last ice day
+  ice = read_csv(csvIce) %>% 
+    dplyr::rename(DateTime = datetime) %>% 
+    filter(month(DateTime) <= 5) %>% 
+    filter(ice_height > 0) %>% 
+    group_by(year = year(DateTime)) %>% 
+    slice(n()) %>% 
+    mutate(iceoff = as.Date(DateTime) + 1)
+}
 
 # Plot model output 
 plot.output <- function(df, title, var = 'temp', startyear, mixeddate1, mixeddate2, zlims = c(0,32), ylims = c(25,-0.5)) {
