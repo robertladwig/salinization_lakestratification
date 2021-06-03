@@ -17,6 +17,7 @@ get_dens <- function(temp, salt){
   return(dens)
 }
 
+name_lake ='mendota'
 bath.data <- read_csv('mendota_bathymetry.csv')
 
 # optimization function
@@ -273,5 +274,5 @@ g2 <- ggplot(m.out.contour, aes(x = Salt, y = Wind[value], col = variable)) +
   theme(legend.position = "none") ; g2
 
 g <- g1 + g2 + plot_annotation(tag_levels = 'A') ;g 
-ggsave(file = 'theoretical.png', g, dpi = 500, width = 6.5, height = 2.5, units = 'in')
+ggsave(file = paste0(name_lake,'_theoretical.png'), g, dpi = 500, width = 6.5, height = 2.5, units = 'in')
 
