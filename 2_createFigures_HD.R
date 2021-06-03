@@ -93,7 +93,7 @@ m.df.mixedDated$variable = factor(m.df.mixedDated$variable, levels = c('null','0
 library("scatterplot3d")
 scatterplot3d(x = m.df.mixedDated$year, y= m.df.mixedDated$variable, z= m.df.mixedDated$value,
               # color = col_vector[1:n],
-               type = 'p')
+              type = 'p')
 
 #### Create dataframe for stratfication duration ####
 m.df.stratdur = a %>% group_by(id, year = year(datetime), salt) %>% 
@@ -117,7 +117,7 @@ m.df.icedur = a %>% mutate(year = if_else(month(datetime) >= 10, year(datetime)+
   filter(ice != 0) %>%
   summarise(iceduration = n()) %>% 
   select(year, id, variable = salt, value = iceduration)
-  
+
 m.df.icedur$variable = factor(m.df.icedur$variable, levels = c('null','0.1','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10'))
 
 m.df.icedur %>% filter(variable == 'null')
@@ -383,7 +383,7 @@ p2 <- plot_ensemble(ncdf, model = model,
                     residuals = TRUE)
 # Arrange the two plots above each other
 p <- p1[[1]] / p2[[1]] + #ggarrange(p1[[1]] + theme_light(),
-               #p2[[1]] + theme_light(), ncol = 1, nrow = 2) +
+  #p2[[1]] + theme_light(), ncol = 1, nrow = 2) +
   plot_layout(guides = 'collect') +
   plot_annotation(tag_levels = 'A', tag_suffix = ')')  & 
   theme(legend.position = 'bottom', plot.tag = element_text(size = 8)) & theme_minimal(); p
@@ -404,8 +404,8 @@ p <- p1 / p2+ #ggarrange(p1[[1]] + theme_light(),
   plot_annotation(tag_levels = 'A', tag_suffix = ')')  & 
   theme(legend.position = 'bottom', plot.tag = element_text(size = 8)) & theme_minimal(); p
 ggsave('figs_HD/salt_ensemble.png', p,  dpi = 500, width = 250,height = 165, units = 'mm')
-                                                          
-                                                          
+
+
 # residence times
 inflow.mendota <- read_csv('numerical/mendota/1_calibration/LakeEnsemblR_inflow_standard.csv')
 mean.mendota <- mean(inflow.mendota$Flow_metersCubedPerSecond)
@@ -425,8 +425,7 @@ print(paste0('residence time of Mendota is ', round(volume.monona/mean.monona/86
 
 # ggsave('output/ensemble_ts2m.png', p,  dpi = 300,width = 384,height = 180, units = 'mm')
 
-
-### field monitoring data by linnea
+### field monitoring data by linnea ####
 me_epi_1920 <- readRDS(file = 'fieldmonitoring/ME_EPI_2019-20.rds') %>% mutate('')
 me_hyp_1920 <- readRDS(file = 'fieldmonitoring/ME_HYPO_2019-20.rds')
 
@@ -435,6 +434,8 @@ mo_hyp_1920 <- readRDS(file = 'fieldmonitoring/MO_HYPO_2019-20.rds')
 
 mo_epi_2021 <- readRDS(file = 'fieldmonitoring/MO_EPI_2020-21.rds')
 mo_hyp_2021 <- readRDS(file = 'fieldmonitoring/MO_HYPO_2020-21.rds')
+
+MSNweather = read_csv('data/USWOOO14837_DaneCountyAirport.csv')
 
 df_me <- merge(me_epi_1920, me_hyp_1920, by = 'date') %>%
   mutate('tempgrad' = Temp.y - Temp.x,
@@ -475,14 +476,16 @@ plotEC <- function(df, usetitle, icedate, icedate2){
     pivot_longer(cols = temp_2:EC.diff, names_to = 'var')
   ggplot(df2) +
     geom_line(aes(x = date, y = value, group = var, col = var)) +
-    scale_color_manual(values = c('red4','lightblue2','lightblue4')) +
+    scale_color_manual(values = c('red4','lightblue2','lightblue4'), labels = c('\u0394 EC', 'Surface Temp', 'Bottom Temp')) +
     geom_vline(xintercept = as.POSIXct(icedate), linetype = 'dashed', size = 0.2) +
     geom_vline(xintercept = as.POSIXct(icedate2), linetype = 'dashed', size = 0.2) +
     ylab('Temp (°C)') +
-    labs(title = usetitle) +
+    # labs(title = usetitle) +
     scale_y_continuous(sec.axis = sec_axis(~.*80, name = bquote('\u0394'~EC ~ (µS~cm^-1)))) +
     theme_custom +
     theme(legend.title = element_blank(),
+          legend.text = element_text(size = 6),
+          legend.margin=unit(-0.6,"cm"),
           plot.title = element_text(size = 8),
           axis.title.x = element_blank(),
           axis.title.y.right = element_text(color = 'red4'),
@@ -495,9 +498,29 @@ g2 = plotEC(df_mo19, usetitle = 'Monona 2019-2020', icedate = '2020-03-20', iced
 g3 = plotEC(df_mo20, usetitle = 'Monona 2020-2021', icedate = '2021-03-22', icedate2 = '2020-12-29') +
   theme(legend.position = 'none')
 
-g1 / g2 / g3
-ggsave('figs_HD/fieldmonitoring_model2.png', dpi = 500, width = 3.25,height = 4, units = 'in')
+plotWeather <- function(df, icedate, usetitle) {
+  ggplot(MSNweather %>% filter(DATE >= as.Date(icedate))) +
+    geom_col(aes(x = DATE, y = AWND)) +
+    geom_col(data = MSNweather, aes(x = DATE, y = AWND), alpha = 0.2) +
+    scale_y_continuous(breaks = c(0,4,8), expand = c(0,0.2)) +
+    scale_x_date(limits = as.Date(c(df$date[1], df$date[nrow(df)]))) +
+    labs(title = usetitle) +
+    theme_custom +
+    theme(legend.title = element_blank(),
+          axis.text.x = element_blank(),
+          plot.title = element_text(size = 7),
+          axis.title.x = element_blank())
+}
+w1 = plotWeather(df = df_me, icedate = '2020-03-22', usetitle = 'A) Mendota 2019-2020')
+w2 = plotWeather(df = df_mo19, icedate = '2020-03-20', usetitle = 'B) Monona 2019-2020')
+w3 = plotWeather(df = df_mo20, icedate = '2021-03-22', usetitle = 'C) Monona 2020-2021')
 
+w1 / g1 / w2 / g2 / w3/ g3 + plot_layout(heights = c(1,3,1,3,1,3))
+
+ggsave('figs_HD/fieldmonitoring_model2.png', dpi = 700, width = 3.25,height = 5, units = 'in')
+
+
+### Other plots 
 g4 <- ggplot(m.df_wtr %>% filter(id == 'Lake Mendota' & variable == 2)) +
   geom_hline(yintercept = 1, linetype = 'dashed', size = 0.2) +
   geom_line(aes(datetime, (value), color = '\u0394 Temp'), size = 0.4) +
