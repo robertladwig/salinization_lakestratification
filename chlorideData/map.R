@@ -49,7 +49,7 @@ mapS = ggplot(lakes.S) +
   # coord_sf(xlim = c(-89.71, -89.58), ylim = c(45.99, 46.04)) +
   NULL
 
-ggsave('chlorideData/Map_Mendota_Monona.png', width = 4, height = 4, dpi = 500, bg = "transparent")
+ggsave(plot = mapS, 'chlorideData/Map_Mendota_Monona.png', width = 3, height = 3, dpi = 500, bg = "transparent")
 
 ##### Chloride ########
 ions = loadLTERions() %>%  filter(lakeid %in% c('ME','MO'))
@@ -61,7 +61,7 @@ try(download.file(inUrl1,infile1,method="curl"))
 
 me.dnr = read_csv(infile1) %>% filter(lakeid %in% c('ME','MO')) %>% 
   group_by(year4, lakeid) %>% 
-  summarise(mean.cl = mean(cl, na.rm = T)) %>% 
+  dplyr::summarise(mean.cl = mean(cl, na.rm = T)) %>% 
   mutate(sampledate = as.Date(paste0(year4,'-07-01')))
 
 # Mendota chloride before 1995
@@ -69,7 +69,7 @@ me.dnr = read_csv('chlorideData/LakeMendota_Dane_WI_VIII.csv') %>% mutate(lakeid
   bind_rows(read_csv('chlorideData/LakeMonona_Dane_WI_VIII.csv') %>%  mutate(lakeid = 'MO')) %>% 
   mutate(year4 = year(Sample.Date)) %>% 
   group_by(year4, lakeid) %>% 
-  summarise(mean.cl = mean(Chloride, na.rm = T)) %>% 
+  dplyr::summarise(mean.cl = mean(Chloride, na.rm = T)) %>% 
   mutate(sampledate = as.Date(paste0(year4,'-07-01')))
 
 
@@ -77,7 +77,7 @@ me.cl = ions %>% filter(lakeid %in% c('ME','MO')) %>%
   filter(!is.na(cl))
 
 me.cl.mean = me.cl %>% group_by(lakeid, year4) %>% 
-  summarise(mean.cl = mean(cl, na.rm = T)) %>% 
+  dplyr::summarise(mean.cl = mean(cl, na.rm = T)) %>% 
   mutate(sampledate = as.Date(paste0(year4,'-07-01')))
 
 cl1.mean = ggplot(me.dnr) +
@@ -93,6 +93,8 @@ cl1.mean = ggplot(me.dnr) +
         legend.key.height =  unit(0.2,"cm"), 
         legend.key.width =  unit(0.2,"cm"), 
         legend.position=c(.2,.8)); cl1.mean
+ggsave(plot = cl1.mean, 'chlorideData/LongTermCL.pdf', width = 3, height = 2, dpi = 500, bg = "transparent")
+
 
 cl.profiles = me.cl %>% filter(month(sampledate) <= 3) %>% 
   filter(year4 > 2000) %>% 
@@ -108,6 +110,7 @@ cl.profiles = me.cl %>% filter(month(sampledate) <= 3) %>%
   xlab(bquote('Chloride' ~ (mg~L^-1))) +
   theme_bw(base_size = 8) +
   theme(legend.position = 'none')
+ggsave(plot = cl.profiles, 'chlorideData/NTLprofiles.pdf', width = 3, height = 3, dpi = 500, bg = "transparent")
 
 
 mapS + cl1.mean +
