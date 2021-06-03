@@ -361,15 +361,18 @@ g1 = ggplot(df.frame) +
   geom_line( aes(time, data, group =  'Scenario' )) + 
   geom_line( aes(time, data * 0, group =  'Null' ), linetype = 'dashed') + 
   geom_line( aes(time, data * 0 + 0.1, group =  'Background' ), linetype = 'dashed') + 
-  annotate('text', x = 2.25, y = 0.05, label = 'Null', hjust = 0) +
-  annotate('text', x = 2.25, y = 0.15, label = 'Background', hjust = 0) +
-  annotate('text', x = 2.25, y = 0.95, label = 'Scenario', hjust = 0) +
+  annotate('text', x = 1, y = 0.05, label = 'Null', hjust = 0, size = 2.5) +
+  annotate('text', x = 1, y = 0.15, label = 'Background', hjust = 0, size = 2.5) +
+  annotate('text', x = 1, y = 0.95, label = 'Scenario', hjust = 0, size = 2.5) +
   ylab(bquote(Salt~load ~ (g~kg^-1))) +
   ylim(0,1.0) +
   theme_minimal(base_size = 8) + 
-  theme(axis.text.y =element_blank(), axis.ticks.y = element_blank()); g1
-ggsave('figs_HD/Approach.png', g1, dpi = 500, width = 165, height = 70, units = 'mm')
-
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_text(angle = 45),
+        axis.text.y =element_blank(),
+        axis.ticks.y = element_blank()); g1
+# ggsave('figs_HD/Approach.png', g1, dpi = 500, width = 165, height = 70, units = 'mm')
+ggsave('figs_HD/Approach2.pdf', g1, dpi = 500, width = 2.5, height = 1.5, units = 'in')
 
 
 ## some comparison plots
