@@ -205,11 +205,15 @@ me.iceoff = getIceOff('output_modelruns/1.5/Mendota_GLM_ice.csv') %>% mutate(mod
 i1 = ice %>% filter(lakeid == 'ME' & year >= 1995 & year(lastice) <= 2015) %>% select(lastice) %>% 
   mutate(year = year(lastice)) %>% left_join(me.iceoff) %>% 
   ggplot() +
-  geom_point(aes(x = yday(lastice), y = yday(iceoff), group = model)) +
+  geom_point(aes(x = as.Date(yday(lastice), origin = as.Date('2019-01-01')), 
+                 y = as.Date(yday(iceoff), origin = as.Date('2019-01-01')), group = model)) +
   geom_abline() +
-  ylab('Modeled ice-off') + xlab('Observed ice-off') +
+  ylab('Modeled ice-off (DOY)') + xlab('Observed ice-off (DOY)') +
+  scale_x_date(labels = date_format("%b"), breaks = 'month') +
+  scale_y_date(labels = date_format("%b"), breaks = 'month') +
   facet_wrap(~model) +
-  labs(title = 'Lake Mendota')
+  labs(title = 'Lake Mendota') +
+  theme_bw(base_size = 8) 
 
 mo.iceoff = getIceOff('output_modelruns/1.5/Monona_GLM_ice.csv') %>% mutate(model = 'GLM') %>% 
   bind_rows(
@@ -221,12 +225,16 @@ mo.iceoff = getIceOff('output_modelruns/1.5/Monona_GLM_ice.csv') %>% mutate(mode
 i2 = ice %>% filter(lakeid == 'MO' & year >= 1995 & year(lastice) <= 2015) %>% select(lastice) %>% 
   mutate(year = year(lastice)) %>% left_join(mo.iceoff) %>% 
   ggplot() +
-  geom_point(aes(x = yday(lastice), y = yday(iceoff), group = model)) +
+  geom_point(aes(x = as.Date(yday(lastice), origin = as.Date('2019-01-01')), 
+                 y = as.Date(yday(iceoff), origin = as.Date('2019-01-01')), group = model)) +
   geom_abline() +
-  ylab('Modeled ice-off') + xlab('Observed ice-off') +
+  ylab('Modeled ice-off (DOY)') + xlab('Observed ice-off (DOY)') +
+  scale_x_date(labels = date_format("%b"), breaks = 'month') +
+  scale_y_date(labels = date_format("%b"), breaks = 'month') +
   facet_wrap(~model) +
-  labs(title = 'Lake Monona')
-
+  labs(title = 'Lake Monona') +
+  theme_bw(base_size = 8) 
 i1/i2
+ggsave('figs_HD/ice_off_comparison.png', dpi = 500, width = 5,height = 5, units = 'in')
 
 
