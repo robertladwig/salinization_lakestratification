@@ -358,12 +358,12 @@ scenario = c(1, 1, 1, 1, 1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 1,1)
 df.frame = data.frame('time' = factor(time, levels = unique(time)), 'data' = scenario)
 
 g1 = ggplot(df.frame) +
-  geom_line( aes(time, data, group =  'Scenario' )) + 
-  geom_line( aes(time, data * 0, group =  'Null' ), linetype = 'dashed') + 
-  geom_line( aes(time, data * 0 + 0.1, group =  'Background' ), linetype = 'dashed') + 
+  geom_line( aes(time, data, group =  'Scenario'), col = 'red4') + 
+  geom_line( aes(time, data * 0, group =  'Null'), linetype = 'dashed') + 
+  geom_line( aes(time, data * 0 + 0.1, group =  'Background' ), linetype = 2, col = 'lightblue4') + 
   annotate('text', x = 1, y = 0.05, label = 'Null', hjust = 0, size = 2.5) +
-  annotate('text', x = 1, y = 0.15, label = 'Background', hjust = 0, size = 2.5) +
-  annotate('text', x = 1, y = 0.95, label = 'Scenario', hjust = 0, size = 2.5) +
+  annotate('text', x = 1, y = 0.15, label = 'Background', hjust = 0, size = 2.5, col = 'lightblue4') +
+  annotate('text', x = 1, y = 0.95, label = 'Scenario', hjust = 0, size = 2.5, col = 'red4') +
   ylab(bquote(Salt~load ~ (g~kg^-1))) +
   ylim(0,1.0) +
   theme_minimal(base_size = 8) + 
