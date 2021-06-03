@@ -219,7 +219,7 @@ mo.iceoff = getIceOff('output_modelruns/1.5/Monona_GLM_ice.csv') %>% mutate(mode
   )
 
 i2 = ice %>% filter(lakeid == 'MO' & year >= 1995 & year(lastice) <= 2015) %>% select(lastice) %>% 
-  mutate(year = year(lastice)) %>% left_join(me.iceoff) %>% 
+  mutate(year = year(lastice)) %>% left_join(mo.iceoff) %>% 
   ggplot() +
   geom_point(aes(x = yday(lastice), y = yday(iceoff), group = model)) +
   geom_abline() +
