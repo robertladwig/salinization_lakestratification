@@ -6,4 +6,4 @@ This repository includes the setup and output from the lake model ensemble (GLM,
 The final figures are located under /figs_HD.
 
 
-![](figs/framework-02.png)<!-- -->
+![](figs_HD/framework-02.png)<!-- -->
