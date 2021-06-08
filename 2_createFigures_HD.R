@@ -18,7 +18,7 @@ read.custom <- function(csv){
   new.df = read_csv(csv, ) %>% 
     mutate(id = case_when(id == 'mendota' ~ 'Lake Mendota',
                           id == 'monona' ~ 'Lake Monona'))
-  colnames(new.df) <- c('datetime','null','0.1','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10','id')
+  colnames(new.df) <- c('datetime','null','BG','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10','id')
   return(new.df)
 }
 
@@ -88,7 +88,7 @@ m.df.mixedDated = a %>% mutate(ice_movavg = zoo::rollmean(ice, k = 90, fill = NA
   filter(density <= 1e-1 & abs(wtr) <= 1 & ice_movavg <= 1e-5) %>% 
   summarize(yday = first(yday(datetime))) %>% 
   select(year, id, variable = salt, value = yday)
-m.df.mixedDated$variable = factor(m.df.mixedDated$variable, levels = c('null','0.1','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10'))
+m.df.mixedDated$variable = factor(m.df.mixedDated$variable, levels = c('null','BG','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10'))
 
 library("scatterplot3d")
 scatterplot3d(x = m.df.mixedDated$year, y= m.df.mixedDated$variable, z= m.df.mixedDated$value,
@@ -103,13 +103,13 @@ m.df.stratdur = a %>% group_by(id, year = year(datetime), salt) %>%
   summarize(min.d = first(yday(datetime)), max.d = last(yday(datetime))) %>% 
   mutate(duration = max.d - min.d) %>% 
   select(year, id, variable = salt, value = duration)
-m.df.stratdur$variable = factor(m.df.stratdur$variable, levels = c('null','0.1','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10'))
+m.df.stratdur$variable = factor(m.df.stratdur$variable, levels = c('null','BG','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10'))
 
 m.df.stratdur_scaled = m.df.stratdur %>% left_join(m.df.stratdur %>% filter(variable == 'null') %>% select(-variable) %>% rename(null = value)) %>% 
   mutate(value = value - null) %>% 
   select(-null)
 
-m.df.stratdur_scaled$variable = factor(m.df.stratdur_scaled$variable, levels = c('null','0.1','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10'))
+m.df.stratdur_scaled$variable = factor(m.df.stratdur_scaled$variable, levels = c('null','BG','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10'))
 
 #### Create dataframe for ice duration ####
 m.df.icedur = a %>% mutate(year = if_else(month(datetime) >= 10, year(datetime)+1, year(datetime))) %>% 
@@ -118,7 +118,7 @@ m.df.icedur = a %>% mutate(year = if_else(month(datetime) >= 10, year(datetime)+
   summarise(iceduration = n()) %>% 
   select(year, id, variable = salt, value = iceduration)
 
-m.df.icedur$variable = factor(m.df.icedur$variable, levels = c('null','0.1','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10'))
+m.df.icedur$variable = factor(m.df.icedur$variable, levels = c('null','BG','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10'))
 
 m.df.icedur %>% filter(variable == 'null')
 
@@ -126,16 +126,16 @@ m.df.icedur_scaled = m.df.icedur %>% left_join(m.df.icedur %>% filter(variable =
   mutate(value = value - null) %>% 
   select(-null)
 
-m.df.icedur_scaled$variable = factor(m.df.icedur_scaled$variable, levels = c('null','0.1','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10'))
+m.df.icedur_scaled$variable = factor(m.df.icedur_scaled$variable, levels = c('null','BG','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10'))
 
 
 m.df.lakenumber = a %>% mutate(year = year(datetime), month = month(datetime), day = day(datetime)) %>%
   select(datetime, id, variable = salt, value = ln, month, day)
-m.df.lakenumber$variable = factor(m.df.lakenumber$variable, levels = c('null','0.1','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10'))
+m.df.lakenumber$variable = factor(m.df.lakenumber$variable, levels = c('null','BG','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10'))
 
 m.df_lakenumber_scaled = a %>% mutate(year = year(datetime), month = month(datetime), day = day(datetime)) %>%
   select(datetime, id, variable = salt, value = ln_scaled, month, day)
-m.df_lakenumber_scaled$variable = factor(m.df_lakenumber_scaled$variable, levels = c('null','0.1','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10'))
+m.df_lakenumber_scaled$variable = factor(m.df_lakenumber_scaled$variable, levels = c('null','BG','0.5','1','1.5','2','2.5','3','3.5','4','4.5','5','10'))
 
 ################################################################################################
 ############ PLOTTING ############
