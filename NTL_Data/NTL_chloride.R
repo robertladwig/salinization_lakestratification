@@ -1,24 +1,25 @@
 library(ggspatial)
 library(sf)
-library(ggrepel)
 library(tidyverse)
-library(NTLlakeloads)
+library(NTLlakeloads) # devtools::install_github('hdugan/NTLlakeloads')
 library(patchwork)
 library(lubridate)
 
-# esri_land <-    paste0('https://services.arcgisonline.com/arcgis/rest/services/NatGeo_World_Map/MapServer/tile/${z}/${y}/${x}.jpeg')
-# esri_streets <- paste0('https://services.arcgisonline.com/arcgis/rest/services/World_Street_Map/MapServer/tile/${z}/${y}/${x}.jpeg')
+# ESRI base map for plotting
 world_gray <-   paste0('https://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/${z}/${y}/${x}.jpeg')
-basemap <- paste0('https://tiles.wmflabs.org/osm-no-labels/${z}/${x}/${y}.png')
 
-# lakes
-lakes.S = st_read('chlorideData/ntl152_v2_0/') %>% filter(LAKEID %in% c('ME', 'MO'))
-bathyME = st_read('chlorideData/ntl153_v3_0/mendota-contours-all.shp') %>% 
+# Lake shapefiles and bathymetry can be found at 
+# Center for Limnology and NTL LTER. 2013. North Temperate Lakes LTER Yahara Lakes District Bathymetry ver 9. 
+# Environmental Data Initiative. https://doi.org/10.6073/pasta/bfc7fcc762572c72e2d2d35cab1d7662 (Accessed 2021-06-08).
+# Center for Limnology and NTL LTER. 2013. North Temperate Lakes LTER Yahara Lakes District Study Lakes ver 10. 
+# Environmental Data Initiative. https://doi.org/10.6073/pasta/7b0a93bd469d6072cc22ec3355483df8 (Accessed 2021-06-08).
+lakes.S = st_read('NTL_data/ntl152_v2_0/') %>% filter(LAKEID %in% c('ME', 'MO'))
+bathyME = st_read('NTL_data/ntl153_v3_0/mendota-contours-all.shp') %>% 
   st_set_crs(3071)
-bathyMO = st_read('chlorideData/ntl153_v3_0/monona_bathy.shp') %>% 
+bathyMO = st_read('NTL_data/ntl153_v3_0/monona_bathy.shp') %>% 
   st_set_crs(3071)
 
-# sampling locations
+# sampling locations for manual sampling and buoy deployment
 # Lake Mendota	43.09885,-89.40545
 # Lake Monona	43.06337,-89.36086
 # Manually build a dataframe 
@@ -49,29 +50,18 @@ mapS = ggplot(lakes.S) +
   # coord_sf(xlim = c(-89.71, -89.58), ylim = c(45.99, 46.04)) +
   NULL
 
-ggsave(plot = mapS, 'chlorideData/Map_Mendota_Monona.png', width = 3, height = 3, dpi = 500, bg = "transparent")
+ggsave(plot = mapS, 'NTL_data/Figures/Map_Mendota_Monona.png', width = 3, height = 3, dpi = 500, bg = "transparent")
 
-##### Chloride ########
-ions = loadLTERions() %>%  filter(lakeid %in% c('ME','MO'))
-
-# knb-lter-ntl.319.17 Mendota chloride before 1995
-inUrl1  <- "https://pasta.lternet.edu/package/data/eml/knb-lter-ntl/319/17/ada50bfcdf3672cb145ab6ba0a4d75d1" 
-infile1 <- tempfile()
-try(download.file(inUrl1,infile1,method="curl"))
-
-me.dnr = read_csv(infile1) %>% filter(lakeid %in% c('ME','MO')) %>% 
-  group_by(year4, lakeid) %>% 
-  dplyr::summarise(mean.cl = mean(cl, na.rm = T)) %>% 
-  mutate(sampledate = as.Date(paste0(year4,'-07-01')))
+##### Chloride time series ########
+ions = loadLTERions() %>%  filter(lakeid %in% c('ME','MO')) # Load LTER ion data 
 
 # Mendota chloride before 1995
-me.dnr = read_csv('chlorideData/LakeMendota_Dane_WI_VIII.csv') %>% mutate(lakeid = 'ME') %>% 
-  bind_rows(read_csv('chlorideData/LakeMonona_Dane_WI_VIII.csv') %>%  mutate(lakeid = 'MO')) %>% 
+me.dnr = read_csv('NTL_data/LakeMendota_Dane_WI_VIII.csv') %>% mutate(lakeid = 'ME') %>% 
+  bind_rows(read_csv('NTL_data/LakeMonona_Dane_WI_VIII.csv') %>%  mutate(lakeid = 'MO')) %>% 
   mutate(year4 = year(Sample.Date)) %>% 
   group_by(year4, lakeid) %>% 
-  dplyr::summarise(mean.cl = mean(Chloride, na.rm = T)) %>% 
+  dplyr::summarise(mean.cl = mean(Chloride_mgL, na.rm = T)) %>% 
   mutate(sampledate = as.Date(paste0(year4,'-07-01')))
-
 
 me.cl = ions %>% filter(lakeid %in% c('ME','MO')) %>% 
   filter(!is.na(cl))
@@ -93,7 +83,7 @@ cl1.mean = ggplot(me.dnr) +
         legend.key.height =  unit(0.2,"cm"), 
         legend.key.width =  unit(0.2,"cm"), 
         legend.position=c(.2,.8)); cl1.mean
-ggsave(plot = cl1.mean, 'chlorideData/LongTermCL.pdf', width = 3, height = 2, dpi = 500, bg = "transparent")
+ggsave(plot = cl1.mean, 'NTL_data/Figures/LongTermCL.pdf', width = 3, height = 2, dpi = 500, bg = "transparent")
 
 
 cl.profiles = me.cl %>% filter(month(sampledate) <= 3) %>% 
@@ -110,13 +100,13 @@ cl.profiles = me.cl %>% filter(month(sampledate) <= 3) %>%
   xlab(bquote('Chloride' ~ (mg~L^-1))) +
   theme_bw(base_size = 8) +
   theme(legend.position = 'none')
-ggsave(plot = cl.profiles, 'chlorideData/NTLprofiles.pdf', width = 3, height = 3, dpi = 500, bg = "transparent")
+ggsave(plot = cl.profiles, 'NTL_data/Figures/NTLprofiles.pdf', width = 3, height = 3, dpi = 500, bg = "transparent")
 
 
 mapS + cl1.mean +
   plot_annotation(tag_levels = 'a', tag_suffix = ')') &
   theme(plot.tag = element_text(size = 8))
-ggsave('chlorideData/Map_Mendota_Monona_Cl.mean.png', width = 6.5, height = 4, dpi = 500, bg = "transparent")
+ggsave('NTL_data/Figures/Map_Mendota_Monona_Cl.mean.png', width = 6.5, height = 4, dpi = 500, bg = "transparent")
 
 layout <- "
 AAABBB
@@ -127,10 +117,12 @@ mapS + cl.profiles + cl1.mean +
   plot_layout(design = layout)  +
   plot_annotation(tag_levels = 'a', tag_suffix = ')') &
   theme(plot.tag = element_text(size = 8))
-ggsave('chlorideData/Map_Trend_Profiles.png', width = 6.5, height = 5, dpi = 500, bg = "transparent")
+ggsave('NTL_data/Figures/Map_Trend_Profiles.png', width = 6.5, height = 5, dpi = 500, bg = "transparent")
 
 
 ###### Density as a function of temperature #######
+# For statistics in introduction
+
 # Freshwater
 calc_dens <- function(wwtemp){
   dens = 999.842594 + (6.793952 * 10^-2 * wwtemp) - (9.095290 * 10^-3 *wwtemp^2) + (1.001685 * 10^-4 * wwtemp^3) - (1.120083 * 10^-6* wwtemp^4) + (6.536336 * 10^-9 * wwtemp^5)
