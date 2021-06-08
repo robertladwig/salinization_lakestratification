@@ -1,3 +1,6 @@
+library(scales)
+library(glmtools)
+
 source('3_plotModel_functions.R')
 startyear = 2013 #Choose start year. Set up to plot two years
 
@@ -39,37 +42,37 @@ mo.obs = plot_var_df(read.output('output_modelruns/NULL/Monona_Obs_temp.csv', st
 #### GLM #####
 me.t.glm.NULL = plot.output(read.output('output_modelruns/NULL/Mendota_GLM_temp.csv', startyear), 
                          var = 'Temp', 
-                         'Lake Mendota: GLM temp @ 0 g/L', startyear, 
+                         'Lake Mendota: GLM temp @ 0 g/kg', startyear, 
                          getMixedDate.ME('output_modelruns/NULL/Mendota_GLM_ice.csv', 'output_modelruns/NULL/Mendota_GLM_dens.csv', startyear), 
                          getMixedDate.ME('output_modelruns/NULL/Mendota_GLM_ice.csv', 'output_modelruns/NULL/Mendota_GLM_dens.csv', startyear+1),
                          zlims = c(0,32))
 me.t.glm.1.5 = plot.output(read.output('output_modelruns/1.5/Mendota_GLM_temp.csv', startyear), 
-                        'Lake Mendota: GLM temp @ 1.5 g/L', startyear, 
+                        'Lake Mendota: GLM temp @ 1.5 g/kg', startyear, 
                         var = 'Temp', 
                         getMixedDate.ME('output_modelruns/1.5/Mendota_GLM_ice.csv', 'output_modelruns/1.5/Mendota_GLM_dens.csv', startyear), 
                         getMixedDate.ME('output_modelruns/1.5/Mendota_GLM_ice.csv', 'output_modelruns/1.5/Mendota_GLM_dens.csv', startyear+1),
                         zlims = c(0,32))
 me.s.glm.1.5 = plot.output(read.output('output_modelruns/1.5/Mendota_GLM_salt.csv', startyear), 
-                        'Lake Mendota: GLM salinity @ 1.5 g/L', startyear, 
+                        'Lake Mendota: GLM salinity @ 1.5 g/kg', startyear, 
                         var = 'Salinity', 
                         getMixedDate.ME('output_modelruns/1.5/Mendota_GLM_ice.csv', 'output_modelruns/1.5/Mendota_GLM_dens.csv', startyear), 
                         getMixedDate.ME('output_modelruns/1.5/Mendota_GLM_ice.csv', 'output_modelruns/1.5/Mendota_GLM_dens.csv', startyear+1),
                         zlims = c(0,1.5))
 
 mo.t.glm.NULL = plot.output(read.output('output_modelruns/NULL/Monona_GLM_temp.csv', startyear), 
-                         'Lake Monona: GLM temp @ 0 g/L', startyear, 
+                         'Lake Monona: GLM temp @ 0 g/kg', startyear, 
                          var = 'Temp', 
                          getMixedDate.MO('output_modelruns/NULL/Monona_GLM_ice.csv', 'output_modelruns/NULL/Monona_GLM_dens.csv', startyear), 
                          getMixedDate.MO('output_modelruns/NULL/Monona_GLM_ice.csv', 'output_modelruns/NULL/Monona_GLM_dens.csv', startyear+1),
                          zlims = c(0,32), ylims = c(21,-0.5))
 mo.t.glm.1.5 = plot.output(read.output('output_modelruns/1.5/Monona_GLM_temp.csv', startyear), 
-                        'Lake Monona: GLM temp @ 1.5 g/L', startyear, 
+                        'Lake Monona: GLM temp @ 1.5 g/kg', startyear, 
                         var = 'Temp',
                         getMixedDate.MO('output_modelruns/1.5/Monona_GLM_ice.csv', 'output_modelruns/1.5/Monona_GLM_dens.csv', startyear), 
                         getMixedDate.MO('output_modelruns/1.5/Monona_GLM_ice.csv', 'output_modelruns/1.5/Monona_GLM_dens.csv', startyear+1),
                         zlims = c(0,32), ylims = c(21,-0.5))
 mo.s.glm.1.5 = plot.output(read.output('output_modelruns/1.5/Monona_GLM_salt.csv', startyear), 
-                        'Lake Monona: GLM salinity @ 1.5 g/L', startyear, 
+                        'Lake Monona: GLM salinity @ 1.5 g/kg', startyear, 
                         var = 'Salinity',
                         getMixedDate.MO('output_modelruns/1.5/Monona_GLM_ice.csv', 'output_modelruns/1.5/Monona_GLM_dens.csv', startyear), 
                         getMixedDate.MO('output_modelruns/1.5/Monona_GLM_ice.csv', 'output_modelruns/1.5/Monona_GLM_dens.csv', startyear+1),
@@ -91,37 +94,37 @@ ggsave(paste0('figs_HD/plotModelOutputs_',startyear,'_GLM.png'), width = 6.5, he
 #### GOTM #####
 me.t.GOTM.NULL = plot.output(read.output('output_modelruns/NULL/Mendota_GOTM_temp.csv', startyear), 
                             var = 'Temp', 
-                            'Lake Mendota: GOTM temp @ 0 g/L', startyear, 
+                            'Lake Mendota: GOTM temp @ 0 g/kg', startyear, 
                             getMixedDate.ME('output_modelruns/NULL/Mendota_GOTM_ice.csv', 'output_modelruns/NULL/Mendota_GOTM_dens.csv', startyear), 
                             getMixedDate.ME('output_modelruns/NULL/Mendota_GOTM_ice.csv', 'output_modelruns/NULL/Mendota_GOTM_dens.csv', startyear+1),
                             zlims = c(0,32))
 me.t.GOTM.1.5 = plot.output(read.output('output_modelruns/1.5/Mendota_GOTM_temp.csv', startyear), 
-                           'Lake Mendota: GOTM temp @ 1.5 g/L', startyear, 
+                           'Lake Mendota: GOTM temp @ 1.5 g/kg', startyear, 
                            var = 'Temp', 
                            getMixedDate.ME('output_modelruns/1.5/Mendota_GOTM_ice.csv', 'output_modelruns/1.5/Mendota_GOTM_dens.csv', startyear), 
                            getMixedDate.ME('output_modelruns/1.5/Mendota_GOTM_ice.csv', 'output_modelruns/1.5/Mendota_GOTM_dens.csv', startyear+1),
                            zlims = c(0,32))
 me.s.GOTM.1.5 = plot.output(read.output('output_modelruns/1.5/Mendota_GOTM_salt.csv', startyear), 
-                           'Lake Mendota: GOTM salinity @ 1.5 g/L', startyear, 
+                           'Lake Mendota: GOTM salinity @ 1.5 g/kg', startyear, 
                            var = 'Salinity', 
                            getMixedDate.ME('output_modelruns/1.5/Mendota_GOTM_ice.csv', 'output_modelruns/1.5/Mendota_GOTM_dens.csv', startyear), 
                            getMixedDate.ME('output_modelruns/1.5/Mendota_GOTM_ice.csv', 'output_modelruns/1.5/Mendota_GOTM_dens.csv', startyear+1),
                            zlims = c(0,1.5))
 
 mo.t.GOTM.NULL = plot.output(read.output('output_modelruns/NULL/Monona_GOTM_temp.csv', startyear), 
-                            'Lake Monona: GOTM temp @ 0 g/L', startyear, 
+                            'Lake Monona: GOTM temp @ 0 g/kg', startyear, 
                             var = 'Temp', 
                             getMixedDate.MO('output_modelruns/NULL/Monona_GOTM_ice.csv', 'output_modelruns/NULL/Monona_GOTM_dens.csv', startyear), 
                             getMixedDate.MO('output_modelruns/NULL/Monona_GOTM_ice.csv', 'output_modelruns/NULL/Monona_GOTM_dens.csv', startyear+1),
                             zlims = c(0,32), ylims = c(21,-0.5))
 mo.t.GOTM.1.5 = plot.output(read.output('output_modelruns/1.5/Monona_GOTM_temp.csv', startyear), 
-                           'Lake Monona: GOTM temp @ 1.5 g/L', startyear, 
+                           'Lake Monona: GOTM temp @ 1.5 g/kg', startyear, 
                            var = 'Temp',
                            getMixedDate.MO('output_modelruns/1.5/Monona_GOTM_ice.csv', 'output_modelruns/1.5/Monona_GOTM_dens.csv', startyear), 
                            getMixedDate.MO('output_modelruns/1.5/Monona_GOTM_ice.csv', 'output_modelruns/1.5/Monona_GOTM_dens.csv', startyear+1),
                            zlims = c(0,32), ylims = c(21,-0.5))
 mo.s.GOTM.1.5 = plot.output(read.output('output_modelruns/1.5/Monona_GOTM_salt.csv', startyear), 
-                           'Lake Monona: GOTM salinity @ 1.5 g/L', startyear, 
+                           'Lake Monona: GOTM salinity @ 1.5 g/kg', startyear, 
                            var = 'Salinity',
                            getMixedDate.MO('output_modelruns/1.5/Monona_GOTM_ice.csv', 'output_modelruns/1.5/Monona_GOTM_dens.csv', startyear), 
                            getMixedDate.MO('output_modelruns/1.5/Monona_GOTM_ice.csv', 'output_modelruns/1.5/Monona_GOTM_dens.csv', startyear+1),
@@ -143,37 +146,37 @@ ggsave(paste0('figs_HD/plotModelOutputs_',startyear,'_GOTM.png'), width = 6.5, h
 #### Simstrat #####
 me.t.Simstrat.NULL = plot.output(read.output('output_modelruns/NULL/Mendota_Simstrat_temp.csv', startyear), 
                              var = 'Temp', 
-                             'Lake Mendota: Simstrat temp @ 0 g/L', startyear, 
+                             'Lake Mendota: Simstrat temp @ 0 g/kg', startyear, 
                              getMixedDate.ME('output_modelruns/NULL/Mendota_Simstrat_ice.csv', 'output_modelruns/NULL/Mendota_Simstrat_dens.csv', startyear), 
                              getMixedDate.ME('output_modelruns/NULL/Mendota_Simstrat_ice.csv', 'output_modelruns/NULL/Mendota_Simstrat_dens.csv', startyear+1),
                              zlims = c(0,32))
 me.t.Simstrat.1.5 = plot.output(read.output('output_modelruns/1.5/Mendota_Simstrat_temp.csv', startyear), 
-                            'Lake Mendota: Simstrat temp @ 1.5 g/L', startyear, 
+                            'Lake Mendota: Simstrat temp @ 1.5 g/kg', startyear, 
                             var = 'Temp', 
                             getMixedDate.ME('output_modelruns/1.5/Mendota_Simstrat_ice.csv', 'output_modelruns/1.5/Mendota_Simstrat_dens.csv', startyear), 
                             getMixedDate.ME('output_modelruns/1.5/Mendota_Simstrat_ice.csv', 'output_modelruns/1.5/Mendota_Simstrat_dens.csv', startyear+1),
                             zlims = c(0,32))
 me.s.Simstrat.1.5 = plot.output(read.output('output_modelruns/1.5/Mendota_Simstrat_salt.csv', startyear), 
-                            'Lake Mendota: Simstrat salinity @ 1.5 g/L', startyear, 
+                            'Lake Mendota: Simstrat salinity @ 1.5 g/kg', startyear, 
                             var = 'Salinity', 
                             getMixedDate.ME('output_modelruns/1.5/Mendota_Simstrat_ice.csv', 'output_modelruns/1.5/Mendota_Simstrat_dens.csv', startyear), 
                             getMixedDate.ME('output_modelruns/1.5/Mendota_Simstrat_ice.csv', 'output_modelruns/1.5/Mendota_Simstrat_dens.csv', startyear+1),
                             zlims = c(0,1.5))
 
 mo.t.Simstrat.NULL = plot.output(read.output('output_modelruns/NULL/Monona_Simstrat_temp.csv', startyear), 
-                             'Lake Monona: Simstrat temp @ 0 g/L', startyear, 
+                             'Lake Monona: Simstrat temp @ 0 g/kg', startyear, 
                              var = 'Temp', 
                              getMixedDate.MO('output_modelruns/NULL/Monona_Simstrat_ice.csv', 'output_modelruns/NULL/Monona_Simstrat_dens.csv', startyear), 
                              getMixedDate.MO('output_modelruns/NULL/Monona_Simstrat_ice.csv', 'output_modelruns/NULL/Monona_Simstrat_dens.csv', startyear+1),
                              zlims = c(0,32), ylims = c(21,-0.5))
 mo.t.Simstrat.1.5 = plot.output(read.output('output_modelruns/1.5/Monona_Simstrat_temp.csv', startyear), 
-                            'Lake Monona: Simstrat temp @ 1.5 g/L', startyear, 
+                            'Lake Monona: Simstrat temp @ 1.5 g/kg', startyear, 
                             var = 'Temp',
                             getMixedDate.MO('output_modelruns/1.5/Monona_Simstrat_ice.csv', 'output_modelruns/1.5/Monona_Simstrat_dens.csv', startyear), 
                             getMixedDate.MO('output_modelruns/1.5/Monona_Simstrat_ice.csv', 'output_modelruns/1.5/Monona_Simstrat_dens.csv', startyear+1),
                             zlims = c(0,32), ylims = c(21,-0.5))
 mo.s.Simstrat.1.5 = plot.output(read.output('output_modelruns/1.5/Monona_Simstrat_salt.csv', startyear), 
-                            'Lake Monona: Simstrat salinity @ 1.5 g/L', startyear, 
+                            'Lake Monona: Simstrat salinity @ 1.5 g/kg', startyear, 
                             var = 'Salinity',
                             getMixedDate.MO('output_modelruns/1.5/Monona_Simstrat_ice.csv', 'output_modelruns/1.5/Monona_Simstrat_dens.csv', startyear), 
                             getMixedDate.MO('output_modelruns/1.5/Monona_Simstrat_ice.csv', 'output_modelruns/1.5/Monona_Simstrat_dens.csv', startyear+1),
