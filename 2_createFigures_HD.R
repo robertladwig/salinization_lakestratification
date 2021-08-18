@@ -478,8 +478,8 @@ plotEC <- function(df, usetitle, icedate, icedate2){
     select(date, temp_2, temp_23.5, EC.diff) %>% 
     pivot_longer(cols = temp_2:EC.diff, names_to = 'var')
   ggplot(df2) +
-    geom_line(aes(x = date, y = value, group = var, col = var)) +
-    scale_color_manual(values = c('red4','lightblue2','lightblue4'), labels = c('\u0394 EC', 'Surface Temp', 'Bottom Temp')) +
+    geom_line(aes(x = date, y = value, group = var, col = var), size = 0.5) +
+    scale_color_manual(values = c('red1','lightblue2','lightblue4'), labels = c('\u0394 EC', 'Surface Temp', 'Bottom Temp')) +
     geom_vline(xintercept = as.POSIXct(icedate), linetype = 'dashed', size = 0.2) +
     geom_vline(xintercept = as.POSIXct(icedate2), linetype = 'dashed', size = 0.2) +
     ylab('Temp (°C)') +
@@ -491,7 +491,7 @@ plotEC <- function(df, usetitle, icedate, icedate2){
           legend.margin=unit(-0.6,"cm"),
           plot.title = element_text(size = 8),
           axis.title.x = element_blank(),
-          axis.title.y.right = element_text(color = 'red4'),
+          axis.title.y.right = element_text(color = 'red1'),
           axis.title.y.left = element_text(color = 'lightblue4')) 
 }
 g1 = plotEC(df_me, usetitle = 'Mendota 2019-2020', icedate = '2020-03-22', icedate2 = '2020-01-12') +
