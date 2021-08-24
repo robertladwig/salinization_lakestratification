@@ -17,8 +17,8 @@ get_dens <- function(temp, salt){
   return(dens)
 }
 
-name_lake ='mendota'
-bath.data <- read_csv('mendota_bathymetry.csv')
+name_lake ='monona'
+bath.data <- read_csv('monona_bathymetry.csv')
 
 # optimization function
 optm_salt <- function(x, wtr.dat = 12, wsp.dat = 1, bath.data = bath.data){
@@ -230,8 +230,8 @@ plot_salt_3d <- function(x, wtr.dat = 12, wsp.dat = 1, bath.data = bath.data){
 }
 
 
-inc_slt <- seq(0.0,50,0.1)
-inc_wnd <- seq(0.0,50,0.1)
+inc_slt <- seq(0.0,30,0.1)
+inc_wnd <- seq(0.0,30,0.1)
 out.matrix <- matrix(NA, ncol = length(inc_slt), nrow = length(inc_wnd))
 for (i in 1:length(inc_slt)){
   print(i)
@@ -253,6 +253,12 @@ m.out.contour <- reshape2::melt(out.contour, id.vars = c('Salt', 'Wind'))
 m.out.contour = m.out.contour %>%
   mutate(label = if_else(Salt == max(Salt), as.character(variable), NA_character_)) 
 
+m.out.contour$variable <- factor(m.out.contour$variable, levels = c('LN_0.1',
+                                                                    'LN_0.5',
+                                                                    'LN_1',
+                                                                    'LN_2',
+                                                                    "LN_10"))
+
 g2 <- ggplot(m.out.contour, aes(x = Salt, y = Wind[value], col = variable)) +
   geom_line() +
   geom_vline(xintercept = as.numeric(opt.salt$par), linetype = 'dashed') +
@@ -262,16 +268,17 @@ g2 <- ggplot(m.out.contour, aes(x = Salt, y = Wind[value], col = variable)) +
   # ylab('Wind speed (m/s)')+
   ylab(bquote(Wind~Speed ~ (m~s^-1))) +
   scale_color_brewer(palette = 'Set1') +
-  geom_curve(aes(x = 30, y = 23, xend = 20, yend = 45), curvature = 0.5, arrow = arrow(length = unit(0.1, "cm")), color = 'grey50', size = 0.2) +
-  annotate(geom = 'text', label = 'turbulent', x = 32, y = 40, color = 'grey50', size = 2.5) +
-  geom_curve(aes(x = 30, y = 18, xend = 33, yend = 8), curvature = -0.5, arrow = arrow(length = unit(0.1, "cm")), color = 'grey50', size = 0.2) +
-  annotate(geom = 'text', label = 'stabilizing', x = 38, y = 13, color = 'grey50', size = 2.5) +
+  geom_curve(aes(x = 20, y = 18, xend = 8, yend = 28), curvature = 0.5, arrow = arrow(length = unit(0.1, "cm")), color = 'grey50', size = 0.2) +
+  annotate(geom = 'text', label = 'turbulent', x = 20.5, y = 27, color = 'grey50', size = 2.5) +
+  geom_curve(aes(x = 20, y = 16, xend = 23, yend = 7), curvature = -0.5, arrow = arrow(length = unit(0.1, "cm")), color = 'grey50', size = 0.2) +
+  annotate(geom = 'text', label = 'stabilizing', x = 27, y = 10, color = 'grey50', size = 2.5) +
   ggtitle('Uniform 8°C')+
-  geom_label_repel(aes(label = label),
-                   nudge_x = 1,
-                   na.rm = TRUE, size = 2) +
+  # geom_label_repel(aes(label = label),
+  #                  nudge_x = 1,
+  #                  na.rm = TRUE, size = 2) +
   theme_minimal(base_size = 8)+
-  theme(legend.position = "none") ; g2
+  xlim(0,30) + ylim(0,30)+ labs(color = '')+
+  theme(legend.position = "right") ; g2
 
 g <- g1 + g2 + plot_annotation(tag_levels = 'A') ;g 
 ggsave(file = paste0(name_lake,'_theoretical.png'), g, dpi = 500, width = 6.5, height = 2.5, units = 'in')
