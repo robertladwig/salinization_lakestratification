@@ -90,6 +90,7 @@ me.t.glm.1.5 + mo.t.glm.1.5 +
 me.s.glm.1.5 + mo.s.glm.1.5 +
 plot_layout(design = layout, guides = 'collect')
 ggsave(paste0('figs_HD/plotModelOutputs_',startyear,'_GLM.png'), width = 6.5, height = 5, units = 'in', dpi = 500)
+ggsave(paste0('figs_HD/figureS03.pdf'), width = 6.5, height = 5, units = 'in', dpi = 500)
        
 #### GOTM #####
 me.t.GOTM.NULL = plot.output(read.output('output_modelruns/NULL/Mendota_GOTM_temp.csv', startyear), 
@@ -142,6 +143,7 @@ me.obs + mo.obs +
   me.s.GOTM.1.5 + mo.s.GOTM.1.5 +
   plot_layout(design = layout, guides = 'collect')
 ggsave(paste0('figs_HD/plotModelOutputs_',startyear,'_GOTM.png'), width = 6.5, height = 5, units = 'in', dpi = 500)
+ggsave(paste0('figs_HD/figureS04.pdf'), width = 6.5, height = 5, units = 'in', dpi = 500)
        
 #### Simstrat #####
 me.t.Simstrat.NULL = plot.output(read.output('output_modelruns/NULL/Mendota_Simstrat_temp.csv', startyear), 
@@ -194,6 +196,7 @@ me.t.Simstrat.NULL + mo.t.Simstrat.NULL +
   me.s.Simstrat.1.5 + mo.s.Simstrat.1.5 +
   plot_layout(design = layout, guides = 'collect')
 ggsave(paste0('figs_HD/plotModelOutputs_',startyear,'_Simstrat.png'), width = 6.5, height = 5, units = 'in', dpi = 500)
+ggsave(paste0('figs_HD/figureS05.pdf'), width = 6.5, height = 5, units = 'in', dpi = 500)
 
 
 

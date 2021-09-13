@@ -347,6 +347,7 @@ g <- g_density / g_icestrat_scaled / g_mixing_hd  / g_lakenumber / g_summerstrat
   theme(legend.position = 'bottom', plot.tag = element_text(size = 8)); g
 
 ggsave('figs_HD/scenarios_Ensemble.png', g,  dpi = 500, width = 165,height = 250, units = 'mm')
+ggsave('figs_HD/figure05.pdf', g,  dpi = 500, width = 165,height = 250, units = 'mm')
 
 
 # Approach
@@ -521,6 +522,7 @@ w3 = plotWeather(df = df_mo20, icedate = '2021-03-22', usetitle = 'C) Monona 202
 w1 / g1 / w2 / g2 / w3/ g3 + plot_layout(heights = c(1,3,1,3,1,3))
 
 ggsave('figs_HD/fieldmonitoring_model2.png', dpi = 700, width = 3.25,height = 5, units = 'in')
+ggsave('figs_HD/figure03.pdf', dpi = 700, width = 3.25,height = 5, units = 'in')
 
 
 ### Other plots 

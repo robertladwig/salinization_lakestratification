@@ -282,4 +282,5 @@ g2 <- ggplot(m.out.contour, aes(x = Salt, y = Wind[value], col = variable)) +
 
 g <- g1 + g2 + plot_annotation(tag_levels = 'A') ;g 
 ggsave(file = paste0(name_lake,'_theoretical.png'), g, dpi = 500, width = 6.5, height = 2.5, units = 'in')
+ggsave(file = paste0(name_lake,'_theoretical.eps'), g, dpi = 500, width = 6.5, height = 2.5, units = 'in')
 
